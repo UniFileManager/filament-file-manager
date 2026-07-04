@@ -1,0 +1,75 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Laravel ${{ matrix.laravel }} / Filament ${{ matrix.filament }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - laravel: '11'
+            filament: '4'
+            testbench: '9'
+            php: '8.2'
+          - laravel: '11'
+            filament: '5'
+            testbench: '9'
+            php: '8.2'
+          - laravel: '12'
+            filament: '4'
+            testbench: '10'
+            php: '8.2'
+          - laravel: '12'
+            filament: '5'
+            testbench: '10'
+            php: '8.2'
+          - laravel: '13'
+            filament: '4'
+            testbench: '11'
+            php: '8.3'
+          - laravel: '13'
+            filament: '5'
+            testbench: '11'
+            php: '8.3'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, fileinfo, mbstring
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-filament-${{ matrix.filament }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-filament-${{ matrix.filament }}-
+
+      - name: Resolve the matrix dependencies
+        run: |
+          composer require --no-interaction --no-update \
+            "illuminate/contracts:^${{ matrix.laravel }}.0" \
+            "illuminate/filesystem:^${{ matrix.laravel }}.0" \
+            "filament/filament:^${{ matrix.filament }}.0"
+          composer require --dev --no-interaction --no-update \
+            "orchestra/testbench:^${{ matrix.testbench }}.0"
+          # Laravel 11 is included as a supported compatibility target even when
+          # Composer's advisory database flags its transitive dependencies.
+          composer update --no-interaction --prefer-dist --prefer-stable --with-all-dependencies --no-security-blocking
+
+      - name: Run package tests
+        run: composer test

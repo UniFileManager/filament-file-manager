@@ -1,0 +1,7 @@
+/vendor/
+/.idea/
+/.zsh_history
+/.DS_Store
+/composer.lock
+/.phpunit.result.cache
+/.pest-cache/

@@ -1,0 +1,51 @@
+{
+  "name": "unifilemanager/filament-file-manager",
+  "description": "A secure, disk-scoped file manager and file picker for Laravel Filament.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sampath Arachchige",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "illuminate/contracts": "^11.0|^12.0|^13.0",
+    "illuminate/filesystem": "^11.0|^12.0|^13.0",
+    "livewire/livewire": "^3.0|^4.0",
+    "filament/filament": "^4.0|^5.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^9.0|^10.0|^11.0",
+    "pestphp/pest": "^3.0|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "UniFileManager\\FilamentFileManager\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "UniFileManager\\FilamentFileManager\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "UniFileManager\\FilamentFileManager\\FilamentFileManagerServiceProvider"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "pest --configuration=phpunit.xml --cache-directory=.pest-cache"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
