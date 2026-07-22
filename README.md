@@ -2,6 +2,56 @@
 
 A Laravel Filament 4/5 package for managing files beneath a configured storage-disk root. It includes a panel page for browsing, uploading, organising, downloading, renaming, and deleting files, plus a form field for storing selected relative paths.
 
+## Screenshots
+
+### File Manager overview
+
+![File Manager overview](docs/screenshots/file-manager-overview.png)
+
+### Browse files and folders
+
+![File Explorer](docs/screenshots/file-explorer.png)
+
+### Upload files
+
+![Upload files modal](docs/screenshots/file-upload-modal.png)
+
+### Image preview and file details
+
+![Image preview and file details](docs/screenshots/image-preview.png)
+
+### Public and private storage areas
+
+![Public and private storage areas](docs/screenshots/public-and-private-storage.png)
+
+### Item layout and sorting
+
+![Item layout and sorting](docs/screenshots/item-layout-and-sorting.png)
+
+### Folders-first layout
+
+![Folders-first layout](docs/screenshots/item-layout-folders-first.png)
+
+### Separate pagination for folders and files
+
+![Separate folder and file pagination](docs/screenshots/separate-pagination.png)
+
+### Bulk delete
+
+![Bulk delete](docs/screenshots/bulk-delete.png)
+
+### UniFilePicker
+
+![UniFilePicker field](docs/screenshots/uni-file-picker.png)
+
+### Selected files in UniFilePicker
+
+![Selected files in UniFilePicker](docs/screenshots/uni-file-picker-selected-files.png)
+
+### Choose files from the library
+
+![File Picker library](docs/screenshots/file-picker-library.png)
+
 ## Install
 
 ```bash
