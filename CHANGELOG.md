@@ -6,6 +6,8 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.2.0 - 2026-07-22
+
 ### Added
 
 - Private and public storage-area configuration.
@@ -14,6 +16,9 @@ The project follows [Semantic Versioning](https://semver.org/).
 - Authenticated, rate-limited private previews.
 - Image preview details with relative-path copying, public URL copying for public media, and in-place renaming.
 - Multi-tenant integration guidance.
+- File Manager navigation icon.
+- File Manager and UniFilePicker screenshots, package cover image, and a reorganised documentation guide.
+- PSR-12 formatting checks with Laravel Pint in local development and GitHub Actions.
 
 ### Changed
 
