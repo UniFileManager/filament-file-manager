@@ -126,7 +126,10 @@
                                     @if ($uploadedFile['is_image'])
                                         <img src="{{ $this->thumbnailUrl($uploadedFile['path']) }}" alt="" />
                                     @else
-                                        <span>FILE</span>
+                                        @php
+                                            $documentKind = $this->documentKind($uploadedFile);
+                                        @endphp
+                                        <span class="ufm__document-icon ufm__document-icon--{{ $documentKind }}"><span>{{ strtoupper($documentKind === 'word' ? 'doc' : $documentKind) }}</span></span>
                                     @endif
                                     <p>{{ $uploadedFile['name'] }}</p>
                                     <em>Uploaded</em>
@@ -401,6 +404,10 @@
                         <dl><dt>Type</dt><dd x-text="imagePreview?.mime || 'Image'"></dd><dt>Size</dt><dd x-text="imagePreview?.size ? (imagePreview.size / 1024).toFixed(1) + ' KB' : '—'"></dd><dt>Modified</dt><dd x-text="imagePreview?.modified ? new Date(imagePreview.modified * 1000).toLocaleDateString() : '—'"></dd></dl>
                         <p>Relative path</p><div class="ufm__preview-copy"><code x-text="imagePreview?.path"></code><button type="button" x-on:click="copyText(imagePreview?.path)">Copy</button></div>
                         <template x-if="imagePreview?.publicUrl"><div><p>Public URL</p><div class="ufm__preview-copy"><code x-text="imagePreview?.publicUrl"></code><button type="button" x-on:click="copyText(imagePreview?.publicUrl)">Copy</button></div></div></template>
+                        <button type="button" class="ufm__preview-download" x-on:click="$wire.download(imagePreview.path)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18.5h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Download file
+                        </button>
                         <button type="button" class="ufm__preview-rename" x-on:click="$wire.beginRename(imagePreview.path); imagePreview = null">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             Rename file

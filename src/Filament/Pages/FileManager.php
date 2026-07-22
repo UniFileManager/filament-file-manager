@@ -52,6 +52,8 @@ final class FileManager extends Page
 
     public string $renamingName = '';
 
+    public bool $isCreatingDirectory = false;
+
     /** @var list<string> */
     public array $selectedPaths = [];
 
@@ -135,6 +137,7 @@ final class FileManager extends Page
         try {
             $this->renamingPath = $fileManager->createNewDirectory(auth()->user(), $this->path);
             $this->renamingName = basename($this->renamingPath);
+            $this->isCreatingDirectory = true;
             $this->refreshItems();
             $this->showNewFolderPage($this->renamingPath);
             $this->dispatch('file-manager:focus-rename');
@@ -157,6 +160,9 @@ final class FileManager extends Page
         }
 
         $renamedPath = $this->renamingPath;
+        $originalName = basename($renamedPath);
+        $itemType = $this->isFilePath($renamedPath) ? 'File' : 'Folder';
+        $isCreatingDirectory = $this->isCreatingDirectory;
         $renamedName = $this->renamingName;
 
         if ($this->isFilePath($renamedPath)) {
@@ -165,7 +171,8 @@ final class FileManager extends Page
         }
 
         try {
-            $fileManager->rename(auth()->user(), $renamedPath, $renamedName);
+            $updatedPath = $fileManager->rename(auth()->user(), $renamedPath, $renamedName);
+            $updatedName = basename($updatedPath);
             $this->selectedPaths = array_values(array_filter(
                 $this->selectedPaths,
                 static fn (string $selectedPath): bool => $selectedPath !== $renamedPath,
@@ -175,7 +182,14 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-                ->title('Item renamed')
+                ->title($isCreatingDirectory
+                    ? 'Folder created'
+                    : ($originalName === $updatedName ? $itemType.' name saved' : $itemType.' renamed'))
+                ->body($isCreatingDirectory
+                    ? sprintf('"%s" was created.', $updatedName)
+                    : ($originalName === $updatedName
+                        ? sprintf('The %s name is unchanged.', strtolower($itemType))
+                        : sprintf('"%s" is now "%s".', $originalName, $updatedName)))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
@@ -197,6 +211,7 @@ final class FileManager extends Page
             }
 
             $this->renamingPath = $path;
+            $this->isCreatingDirectory = false;
             $this->renamingName = $item['type'] === 'file'
                 ? $this->fileNameWithoutExtension($item['name'])
                 : $item['name'];
@@ -211,6 +226,7 @@ final class FileManager extends Page
     {
         $this->renamingPath = null;
         $this->renamingName = '';
+        $this->isCreatingDirectory = false;
         $this->resetValidation('renamingName');
     }
 

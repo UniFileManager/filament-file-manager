@@ -6,6 +6,18 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.3.0 - 2026-07-22
+
+### Added
+
+- Download action in the File Manager image-preview modal.
+- File-type tiles for PDF, Word, spreadsheet, and text files in the upload modal.
+
+### Changed
+
+- New folders now confirm creation with their final name after inline naming.
+- File and folder rename notifications now identify the affected item.
+
 ## 0.2.0 - 2026-07-22
 
 ### Added
