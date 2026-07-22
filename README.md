@@ -336,6 +336,17 @@ The panel includes a reusable File Picker field, inline file rename, single-file
 - [Release policy](docs/releasing.md)
 - [MIT License](LICENSE)
 
+## Development checks
+
+Run the code-style check and package tests before opening a pull request:
+
+```bash
+composer lint
+composer test
+```
+
+Use `composer format` to apply the package's PSR-12 formatting rules.
+
 ## Maintainer
 
 UniFileManager is maintained by Sampath Arachchige.

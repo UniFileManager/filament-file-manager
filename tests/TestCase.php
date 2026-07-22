@@ -32,7 +32,7 @@ abstract class TestCase extends Orchestra
             'visibility' => 'private',
         ]);
         $app['config']->set('filesystems.disks.testing', ['driver' => 'local', 'root' => storage_path('framework/testing/disks/testing')]);
-        $app->bind(FileManagerAuthorizer::class, static fn (): FileManagerAuthorizer => new class implements FileManagerAuthorizer {
+        $app->bind(FileManagerAuthorizer::class, static fn (): FileManagerAuthorizer => new class () implements FileManagerAuthorizer {
             public function can(mixed $user, string $operation, string $path = ''): bool
             {
                 return $user !== null;

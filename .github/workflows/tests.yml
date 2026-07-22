@@ -71,5 +71,8 @@ jobs:
           # Composer's advisory database flags its transitive dependencies.
           composer update --no-interaction --prefer-dist --prefer-stable --with-all-dependencies --no-security-blocking
 
+      - name: Check code style
+        run: composer lint
+
       - name: Run package tests
         run: composer test

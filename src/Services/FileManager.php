@@ -22,8 +22,7 @@ final class FileManager
     public function __construct(
         private readonly FileManagerAuthorizer $authorizer,
         private readonly ImageThumbnailer $thumbnailer,
-    )
-    {
+    ) {
     }
 
     /** Return an isolated manager for the given configured storage area. */

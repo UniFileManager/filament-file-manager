@@ -156,13 +156,13 @@ final class FileManager extends Page
             return;
         }
 
-            $renamedPath = $this->renamingPath;
-            $renamedName = $this->renamingName;
+        $renamedPath = $this->renamingPath;
+        $renamedName = $this->renamingName;
 
-            if ($this->isFilePath($renamedPath)) {
-                $extension = $this->fileExtension($renamedPath);
-                $renamedName .= $extension === '' ? '' : '.'.$extension;
-            }
+        if ($this->isFilePath($renamedPath)) {
+            $extension = $this->fileExtension($renamedPath);
+            $renamedName .= $extension === '' ? '' : '.'.$extension;
+        }
 
         try {
             $fileManager->rename(auth()->user(), $renamedPath, $renamedName);
