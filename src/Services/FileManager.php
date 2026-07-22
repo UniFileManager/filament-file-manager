@@ -250,6 +250,27 @@ final class FileManager
         return $this->absolutePath($path);
     }
 
+    /**
+     * Confirm that a file can be selected by a File Picker and return its MIME type.
+     *
+     * @return array{path: string, mime_type: string}
+     */
+    public function selectableFile(mixed $user, string $path): array
+    {
+        $path = $this->normalisePath($path);
+        $this->authorize($user, 'view', $path);
+
+        $absolutePath = $this->absolutePath($path);
+        if (! $this->disk()->exists($absolutePath) || $this->disk()->directoryExists($absolutePath)) {
+            throw new InvalidFilePath('The selected file is not available.');
+        }
+
+        return [
+            'path' => $path,
+            'mime_type' => (string) $this->disk()->mimeType($absolutePath),
+        ];
+    }
+
     public function publicUrl(mixed $user, string $path): ?string
     {
         $path = $this->normalisePath($path);

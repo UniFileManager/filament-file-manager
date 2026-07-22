@@ -7,6 +7,9 @@ namespace UniFileManager\FilamentFileManager\Filament\Forms\Components;
 use Closure;
 use Filament\Forms\Components\Field;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use UniFileManager\FilamentFileManager\Services\FileManager as FileManagerService;
 use UniFileManager\FilamentFileManager\Support\DirectoryScope;
 use UniFileManager\FilamentFileManager\Support\MimeTypeMatcher;
 use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
@@ -43,6 +46,18 @@ class UniFilePicker extends Field
 
     /** @var array<string>|Closure|null */
     protected array|Closure|null $allowedMimeTypes = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Browser state is never a permission boundary. Validate selections both
+        // during form validation and when Filament dehydrates state for saving.
+        $validateSelection = static fn (UniFilePicker $component, mixed $state): mixed => $component->validateSelectionState($state);
+
+        $this->mutateStateForValidationUsing($validateSelection);
+        $this->mutateDehydratedStateUsing($validateSelection);
+    }
 
     /**
      * @deprecated Use the `file_picker_manager_url` config value, or `library()` to control library access.
@@ -281,6 +296,53 @@ class UniFilePicker extends Field
         ));
     }
 
+    /**
+     * Revalidate browser-provided state before a form validates or persists it.
+     *
+     * @return string|list<string>|null
+     */
+    public function validateSelectionState(mixed $state): string|array|null
+    {
+        if ($this->isMultiple()) {
+            if ($state === null || $state === '') {
+                return [];
+            }
+
+            if (! is_array($state)) {
+                $this->throwInvalidSelection();
+            }
+
+            if (count($state) > $this->getMaxFiles()) {
+                $this->throwInvalidSelection();
+            }
+
+            $paths = [];
+            foreach ($state as $path) {
+                if (! is_string($path)) {
+                    $this->throwInvalidSelection();
+                }
+
+                $paths[] = $this->validateSelectedPath($path);
+            }
+
+            if (! $this->allowsDuplicateSelection() && count($paths) !== count(array_unique($paths))) {
+                $this->throwInvalidSelection();
+            }
+
+            return $paths;
+        }
+
+        if ($state === null || $state === '') {
+            return null;
+        }
+
+        if (! is_string($state)) {
+            $this->throwInvalidSelection();
+        }
+
+        return $this->validateSelectedPath($state);
+    }
+
     public function isImagePath(string $path): bool
     {
         return in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
@@ -305,5 +367,34 @@ class UniFilePicker extends Field
             'txt' => 'text',
             default => 'file',
         };
+    }
+
+    private function validateSelectedPath(string $path): string
+    {
+        try {
+            $path = DirectoryScope::normalise($path);
+            if (! DirectoryScope::contains($this->getDirectory(), $path)) {
+                $this->throwInvalidSelection();
+            }
+
+            $file = app(FileManagerService::class)
+                ->forArea($this->getStorageArea())
+                ->selectableFile(auth()->user(), $path);
+
+            if (! MimeTypeMatcher::allows($file['mime_type'], $this->getAllowedMimeTypes())) {
+                $this->throwInvalidSelection();
+            }
+
+            return $file['path'];
+        } catch (InvalidFilePath|AccessDeniedHttpException) {
+            $this->throwInvalidSelection();
+        }
+    }
+
+    private function throwInvalidSelection(): never
+    {
+        throw ValidationException::withMessages([
+            $this->getStatePath() => 'Select a permitted file from this library.',
+        ]);
     }
 }

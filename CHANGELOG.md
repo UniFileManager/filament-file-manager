@@ -6,6 +6,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.3.1 - 2026-07-23
+
+### Security
+
+- Revalidate UniFilePicker selections on the server before validation and persistence, including directory scope, file existence, MIME restrictions, selection limits, and authorization.
+
 ## 0.3.0 - 2026-07-22
 
 ### Added
