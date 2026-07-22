@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UniFileManager\FilamentFileManager;
 
+use BladeUI\Icons\Factory as IconFactory;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -28,6 +29,14 @@ final class FilamentFileManagerServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->resolved(IconFactory::class)) {
+            $this->registerIcons($this->app->make(IconFactory::class));
+        } else {
+            $this->callAfterResolving(IconFactory::class, function (IconFactory $icons): void {
+                $this->registerIcons($icons);
+            });
+        }
+
         RateLimiter::for('filament-file-manager-previews', static function (Request $request): Limit {
             $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
 
@@ -48,5 +57,13 @@ final class FilamentFileManagerServiceProvider extends ServiceProvider
         FilamentAsset::register([
             Css::make('file-manager', __DIR__.'/../resources/css/file-manager.css'),
         ], package: 'unifilemanager/filament-file-manager');
+    }
+
+    private function registerIcons(IconFactory $icons): void
+    {
+        $icons->add('unifile-manager', [
+            'path' => __DIR__.'/../resources/svg',
+            'prefix' => 'ufm',
+        ]);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UniFileManager\FilamentFileManager\Filament\Pages;
 
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
@@ -32,6 +33,8 @@ final class FileManager extends Page
     protected string $view = 'filament-file-manager::livewire.file-manager';
 
     protected static bool $shouldRegisterNavigation = true;
+
+    protected static string | BackedEnum | null $navigationIcon = 'ufm-file-manager';
 
     public string $path = '';
 

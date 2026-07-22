@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UniFileManager\FilamentFileManager\Tests;
 
+use BladeUI\Icons\BladeIconsServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Livewire\LivewireServiceProvider;
 use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
@@ -14,6 +15,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
+            BladeIconsServiceProvider::class,
             LivewireServiceProvider::class,
             FilamentFileManagerServiceProvider::class,
         ];
