@@ -17,6 +17,7 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UniFileManager\FilamentFileManager\Services\FileManager as FileManagerService;
+use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
 use UniFileManager\FilamentFileManager\Exceptions\FolderNotEmpty;
 use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
 use Throwable;
@@ -97,7 +98,7 @@ final class FileManager extends Page
     /** @return array<string, string> */
     public function availableStorageAreas(): array
     {
-        $areas = config('filament-file-manager.storage_areas', []);
+        $areas = app(StorageAreaResolver::class)->areas();
         $available = [];
         foreach (is_array($areas) ? $areas : [] as $key => $area) {
             if (is_string($key) && is_array($area) && ($area['enabled'] ?? false)) {

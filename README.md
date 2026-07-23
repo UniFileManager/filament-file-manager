@@ -112,8 +112,9 @@ model does not have an `is_admin` attribute, use an existing role or permission
 check instead. Users granted the ability can open the **File Manager** page from
 your Filament navigation.
 
-For tenant-specific access, implement `FileManagerAuthorizer`. See the
-[multi-tenancy guide](docs/multi-tenancy.md) for a working pattern.
+For tenant-specific access, implement both `FileManagerAuthorizer` and a
+request-aware `StorageAreaResolver`. See the [multi-tenancy guide](docs/multi-tenancy.md)
+for a working pattern.
 
 ## Storage areas
 
@@ -143,6 +144,10 @@ public disk or CDN configured deliberately:
 When more than one area is enabled, File Manager displays a storage-area
 switcher. The user's last selection is remembered for their current session.
 Items from different areas are never mixed in one directory listing.
+
+For multi-tenant applications, replace the static storage-area configuration
+with a trusted request-aware resolver. Do not derive a disk or root from browser
+input. See the [multi-tenancy guide](docs/multi-tenancy.md).
 
 ### Private files and public media
 
@@ -286,6 +291,7 @@ php artisan vendor:publish --tag=filament-file-manager-config
 | `items_per_page` | `20` | Page size when all items are together |
 | `max_directory_depth` | `7` | Folder levels below the configured root |
 | `show_item_layout` | `false` | Show the folders-first and all-items-together control |
+| `storage_area_resolver` | `ConfigStorageAreaResolver::class` | Resolves storage areas for the current server-side context |
 | `preview_rate_limit` | `60` | Preview and thumbnail requests per minute |
 | `thumbnails.max_source_pixels` | `8000000` | Largest source image considered for thumbnail generation |
 
@@ -319,9 +325,9 @@ when opening File Manager.
   `public` disk and local roots below `public/` or `storage/app/public` when an
   area is configured as private.
 - Replace the default `manageFileManager` check with an application-specific
-  `FileManagerAuthorizer` when access depends on tenants or paths. Read the
-  [multi-tenancy guide](docs/multi-tenancy.md) before enabling the package in a
-  tenant application.
+  `FileManagerAuthorizer` and `StorageAreaResolver` when access depends on
+  tenants or paths. Read the [multi-tenancy guide](docs/multi-tenancy.md)
+  before enabling the package in a tenant application.
 - Keep the package MIME and extension lists narrow for your use case. The
   picker can apply a narrower list with `allowedMimeTypes()`.
 - The configured root cannot be renamed, moved, or deleted. A folder cannot be

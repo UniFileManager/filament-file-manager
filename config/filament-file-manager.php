@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use UniFileManager\FilamentFileManager\Support\DefaultFileManagerAuthorizer;
+use UniFileManager\FilamentFileManager\Support\ConfigStorageAreaResolver;
 
 return [
     /* @deprecated Use storage_areas.private.disk. */
@@ -33,6 +34,12 @@ return [
             'visibility' => 'public',
         ],
     ],
+
+    /*
+     * Resolve storage areas from trusted, server-side request context. Leave the
+     * default resolver in place for standard single-tenant applications.
+     */
+    'storage_area_resolver' => ConfigStorageAreaResolver::class,
 
     /* Used by UniFilePicker when more than one area is enabled. Private is the safer default. */
     'file_picker_default_area' => 'private',

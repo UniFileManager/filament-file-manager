@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
+use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
 use UniFileManager\FilamentFileManager\Exceptions\FolderNotEmpty;
 use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
 use UniFileManager\FilamentFileManager\Exceptions\UnsafeDiskConfiguration;
@@ -19,10 +20,14 @@ final class FileManager
 {
     private string $storageArea = 'private';
 
+    private readonly ?StorageAreaResolver $storageAreaResolver;
+
     public function __construct(
         private readonly FileManagerAuthorizer $authorizer,
         private readonly ImageThumbnailer $thumbnailer,
+        ?StorageAreaResolver $storageAreaResolver = null,
     ) {
+        $this->storageAreaResolver = $storageAreaResolver;
     }
 
     /** Return an isolated manager for the given configured storage area. */
@@ -507,8 +512,8 @@ final class FileManager
     /** @return array{enabled: bool, disk: string, root: string, visibility: string} */
     private function areaConfiguration(): array
     {
-        $areas = config('filament-file-manager.storage_areas', []);
-        $configuration = is_array($areas) ? ($areas[$this->storageArea] ?? null) : null;
+        $configuration = ($this->storageAreaResolver ?? app(StorageAreaResolver::class))
+            ->resolve($this->storageArea);
 
         if (! is_array($configuration) && $this->storageArea === 'private') {
             $configuration = [

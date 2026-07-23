@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use UniFileManager\FilamentFileManager\Services\FileManager as FileManagerService;
+use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
 use UniFileManager\FilamentFileManager\Support\DirectoryScope;
 use UniFileManager\FilamentFileManager\Support\MimeTypeMatcher;
 use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
@@ -273,7 +274,7 @@ class UniFilePicker extends Field
         }
 
         $areas = array_filter(
-            config('filament-file-manager.storage_areas', []),
+            app(StorageAreaResolver::class)->areas(),
             static fn (mixed $area): bool => is_array($area) && ($area['enabled'] ?? false),
         );
 

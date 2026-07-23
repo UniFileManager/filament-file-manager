@@ -13,9 +13,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
 use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
+use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
 use UniFileManager\FilamentFileManager\Livewire\FilePickerExplorer;
 use UniFileManager\FilamentFileManager\Livewire\UniFilePickerUploader;
 use UniFileManager\FilamentFileManager\Services\FileManager;
+use UniFileManager\FilamentFileManager\Support\ConfigStorageAreaResolver;
 
 final class FilamentFileManagerServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,11 @@ final class FilamentFileManagerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/filament-file-manager.php', 'filament-file-manager');
 
         $this->app->bind(FileManagerAuthorizer::class, config('filament-file-manager.authorizer'));
+        $storageAreaResolver = config('filament-file-manager.storage_area_resolver');
+        $this->app->bind(
+            StorageAreaResolver::class,
+            is_string($storageAreaResolver) ? $storageAreaResolver : ConfigStorageAreaResolver::class,
+        );
         $this->app->singleton(FileManager::class);
     }
 

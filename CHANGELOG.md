@@ -6,6 +6,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.4.0 - 2026-07-23
+
+### Added
+
+- Optional request-aware `StorageAreaResolver` support for tenant-specific disks and roots without changing standard single-tenant configuration.
+
 ## 0.3.1 - 2026-07-23
 
 ### Security

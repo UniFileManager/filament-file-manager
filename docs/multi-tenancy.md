@@ -1,39 +1,70 @@
 # Multi-tenancy
 
-UniFileManager deliberately uses one configured storage root. It does not infer
-a tenant from the authenticated user. In a multi-tenant application, configure
-the disk and root in your tenancy bootstrap and replace the default authorizer.
+UniFileManager does not infer a tenant from the authenticated user. In a
+multi-tenant application, use a request-aware storage-area resolver and replace
+the default authorizer.
 
 Do not rely on a generic `manageFileManager` ability alone: it grants access to the entire configured root.
 
-## Recommended: one private disk root per tenant
+## Recommended: a tenant-aware storage-area resolver
 
-Set a tenant-specific private disk root before Filament handles the request. The
-package can then continue to use the same relative paths, such as
-`avatars/jane.jpg`, without exposing another tenant's files.
+The resolver receives no browser input. It obtains the tenant from your trusted
+server-side tenancy context and returns only that tenant's storage areas. The
+package can then continue to use relative paths, such as `avatars/jane.jpg`,
+without exposing another tenant's files.
 
 ```php
-// Run from your tenancy middleware / tenancy bootstrapper.
-config()->set('filesystems.disks.tenant-files', [
-    'driver' => 'local',
-    'root' => storage_path('app/tenants/'.tenant()->getKey().'/files'),
-    'visibility' => 'private',
-]);
+namespace App\Support;
 
-config()->set('filament-file-manager.disk', 'tenant-files');
-config()->set('filament-file-manager.root', 'file-manager');
+use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
+
+final class TenantStorageAreaResolver implements StorageAreaResolver
+{
+    public function areas(): array
+    {
+        $tenantId = tenant()->getKey();
+
+        return [
+            'private' => [
+                'enabled' => true,
+                'disk' => 'local',
+                'root' => "tenants/{$tenantId}/file-manager",
+                'visibility' => 'private',
+            ],
+        ];
+    }
+
+    public function resolve(string $area): ?array
+    {
+        $configuration = $this->areas()[$area] ?? null;
+
+        return is_array($configuration) ? $configuration : null;
+    }
+}
 ```
 
-Use your tenancy package's request-scoped configuration facility. With Laravel
-Octane, do not mutate global configuration unless it is reset after every request.
-
-## Shared disk alternative
-
-If all tenants must share one private disk, set a tenant-specific package root in your tenancy bootstrapper:
+Register it in `config/filament-file-manager.php`:
 
 ```php
-config()->set('filament-file-manager.disk', 'local');
-config()->set('filament-file-manager.root', 'tenants/'.tenant()->getKey().'/file-manager');
+'storage_area_resolver' => App\Support\TenantStorageAreaResolver::class,
+```
+
+This is safe for Laravel Octane as long as your tenancy context is correctly
+reset between requests. Do not cache a tenant identifier inside the resolver.
+
+## One disk per tenant
+
+The example above uses a shared private disk with a tenant-specific root. You
+may instead return a tenant-specific disk name when your tenancy system creates
+one disk per tenant.
+
+```php
+'private' => [
+    'enabled' => true,
+    'disk' => 'tenant-'.tenant()->getKey(),
+    'root' => 'file-manager',
+    'visibility' => 'private',
+],
 ```
 
 The tenant identifier must come from trusted, server-side tenancy context—not a
