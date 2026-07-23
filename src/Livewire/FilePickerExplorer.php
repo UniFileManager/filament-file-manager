@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace UniFileManager\FilamentFileManager\Livewire;
 
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
@@ -17,8 +23,10 @@ use UniFileManager\FilamentFileManager\Support\DirectoryScope;
 use UniFileManager\FilamentFileManager\Support\MimeTypeMatcher;
 use Throwable;
 
-final class FilePickerExplorer extends Component
+final class FilePickerExplorer extends Component implements HasActions, HasSchemas
 {
+    use InteractsWithActions;
+    use InteractsWithSchemas;
     use WithFileUploads;
     use WithPagination;
 
@@ -180,7 +188,21 @@ final class FilePickerExplorer extends Component
     {
         $configuredMaximum = max(1, (int) config('filament-file-manager.max_upload_files'));
         $phpMaximum = (int) ini_get('max_file_uploads');
-        return $phpMaximum > 0 ? min($configuredMaximum, $phpMaximum) : $configuredMaximum;
+        $remainingSlots = max(1, $this->availableSelectionSlots());
+
+        return $phpMaximum > 0
+            ? min($configuredMaximum, $phpMaximum, $remainingSlots)
+            : min($configuredMaximum, $remainingSlots);
+    }
+
+    public function availableSelectionSlots(): int
+    {
+        return $this->multiple ? max(0, $this->maxFiles - count($this->selectedPaths)) : 1;
+    }
+
+    public function canUpload(): bool
+    {
+        return $this->availableSelectionSlots() > 0;
     }
 
     public function acceptedFileTypes(): string
@@ -192,6 +214,36 @@ final class FilePickerExplorer extends Component
     {
         $this->reset('uploads');
         $this->addError('uploads', sprintf('You selected %d files. The maximum is %d files.', $count, $this->maximumUploadFiles()));
+    }
+
+    public function deleteUploadedPreviewAction(): Action
+    {
+        return Action::make('deleteUploadedPreview')
+            ->requiresConfirmation()
+            ->modalHeading('Delete uploaded file?')
+            ->modalDescription('This permanently deletes the file from your library.')
+            ->modalSubmitActionLabel('Delete file')
+            ->color('danger')
+            ->action(function (array $arguments): void {
+                $path = $arguments['path'] ?? null;
+
+                if (is_string($path)) {
+                    $this->deleteUploadedPreview($path);
+                }
+            });
+    }
+
+    public function deleteAllUploadedPreviewsAction(): Action
+    {
+        return Action::make('deleteAllUploadedPreviews')
+            ->requiresConfirmation()
+            ->modalHeading('Delete all these uploads?')
+            ->modalDescription('This permanently deletes every file currently listed in this upload window.')
+            ->modalSubmitActionLabel('Delete all files')
+            ->color('danger')
+            ->action(function (): void {
+                $this->deleteAllUploadedPreviews();
+            });
     }
 
     public function select(string $path): void
@@ -382,6 +434,12 @@ final class FilePickerExplorer extends Component
     private function storeUploads(): void
     {
         try {
+            if (! $this->canUpload()) {
+                throw ValidationException::withMessages([
+                    'uploads' => 'Use or remove the selected files before uploading more.',
+                ]);
+            }
+
             $this->validate([
                 'uploads' => ['required', 'array', 'min:1', 'max:'.$this->maximumUploadFiles()],
                 'uploads.*' => ['file'],
@@ -413,6 +471,7 @@ final class FilePickerExplorer extends Component
 
             $this->reset('uploads');
             $this->uploadedPreviewFiles = array_values(array_merge($uploadedPreviewFiles, $this->uploadedPreviewFiles));
+            $this->selectUploadedPaths($uploadedPaths);
             $this->uploadMessage = count($uploadedPaths) === 1
                 ? basename($uploadedPaths[0]).' uploaded.'
                 : sprintf('%d files uploaded.', count($uploadedPaths));
@@ -424,6 +483,93 @@ final class FilePickerExplorer extends Component
             report($exception);
             $this->reset('uploads');
             $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : 'The files could not be uploaded. Please try again.');
+        }
+    }
+
+    private function deleteUploadedPreview(string $path): void
+    {
+        if (! in_array($path, array_column($this->uploadedPreviewFiles, 'path'), true)) {
+            return;
+        }
+
+        try {
+            app(FileManagerService::class)->forArea($this->storageArea)->delete(auth()->user(), $path);
+            $this->uploadedPreviewFiles = array_values(array_filter(
+                $this->uploadedPreviewFiles,
+                static fn (array $file): bool => $file['path'] !== $path,
+            ));
+            $this->selectedPaths = array_values(array_filter(
+                $this->selectedPaths,
+                static fn (string $selectedPath): bool => $selectedPath !== $path,
+            ));
+            $this->refreshItems();
+
+            Notification::make()
+                ->success()
+                ->title('Uploaded file deleted')
+                ->body('The file was removed from your library.')
+                ->send();
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->danger()
+                ->title('Delete failed')
+                ->body('The uploaded file could not be deleted. Please try again.')
+                ->send();
+        }
+    }
+
+    private function deleteAllUploadedPreviews(): void
+    {
+        $deletedPaths = [];
+        $failed = 0;
+        $fileManager = app(FileManagerService::class)->forArea($this->storageArea);
+
+        foreach ($this->uploadedPreviewFiles as $file) {
+            try {
+                $fileManager->delete(auth()->user(), $file['path']);
+                $deletedPaths[] = $file['path'];
+            } catch (Throwable $exception) {
+                report($exception);
+                $failed++;
+            }
+        }
+
+        if ($deletedPaths !== []) {
+            $this->uploadedPreviewFiles = array_values(array_filter(
+                $this->uploadedPreviewFiles,
+                static fn (array $file): bool => ! in_array($file['path'], $deletedPaths, true),
+            ));
+            $this->selectedPaths = array_values(array_filter(
+                $this->selectedPaths,
+                static fn (string $path): bool => ! in_array($path, $deletedPaths, true),
+            ));
+            $this->refreshItems();
+        }
+
+        Notification::make()
+            ->{$failed === 0 ? 'success' : 'warning'}()
+            ->title($failed === 0 ? 'Uploaded files deleted' : 'Some uploads were not deleted')
+            ->body($failed === 0
+                ? 'All files listed in this upload window were deleted.'
+                : 'Some files could not be deleted. They remain listed.')
+            ->send();
+    }
+
+    /** @param list<string> $paths */
+    private function selectUploadedPaths(array $paths): void
+    {
+        if (! $this->multiple) {
+            $this->dispatch('unifile-manager:selected', pickerId: $this->pickerId, path: $paths[0] ?? null);
+
+            return;
+        }
+
+        foreach ($paths as $path) {
+            if (! in_array($path, $this->selectedPaths, true) && ! $this->selectionLimitReached()) {
+                $this->selectedPaths[] = $path;
+            }
         }
     }
 
