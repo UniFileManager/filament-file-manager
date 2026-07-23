@@ -6,6 +6,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.6.0 - 2026-07-23
+
+### Added
+
+- Laravel translation support for File Picker and primary File Manager interface text, including a publishable English language file.
+
 ## 0.5.0 - 2026-07-23
 
 ### Added

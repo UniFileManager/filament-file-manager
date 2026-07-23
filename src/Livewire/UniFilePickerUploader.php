@@ -66,7 +66,7 @@ final class UniFilePickerUploader extends Component
     {
         if (count($this->uploads) > $this->maximumUploadFiles()) {
             $this->reset('uploads');
-            $this->addError('uploads', sprintf('You may upload a maximum of %d files at once.', $this->maximumUploadFiles()));
+            $this->addError('uploads', __('filament-file-manager::file-manager.too_many_files', ['count' => $this->maximumUploadFiles()]));
 
             return;
         }
@@ -79,7 +79,7 @@ final class UniFilePickerUploader extends Component
     public function rejectTooManyFiles(int $count): void
     {
         $this->reset('uploads');
-        $this->addError('uploads', sprintf('You selected %d files. The maximum is %d files.', $count, $this->maximumUploadFiles()));
+        $this->addError('uploads', __('filament-file-manager::file-manager.selected_too_many_files', ['selected' => $count, 'count' => $this->maximumUploadFiles()]));
     }
 
     public function openLibrary(): void
@@ -118,7 +118,7 @@ final class UniFilePickerUploader extends Component
 
             if (! $this->uploadsUseAllowedMimeTypes($uploads)) {
                 throw ValidationException::withMessages([
-                    'uploads' => 'One or more selected files are not supported by this field.',
+                    'uploads' => __('filament-file-manager::file-manager.unsupported_field_files'),
                 ]);
             }
 
@@ -137,7 +137,7 @@ final class UniFilePickerUploader extends Component
         } catch (Throwable $exception) {
             report($exception);
             $this->reset('uploads');
-            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : 'The files could not be uploaded. Please try again.');
+            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.upload_failed'));
         }
     }
 

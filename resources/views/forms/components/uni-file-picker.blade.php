@@ -72,14 +72,14 @@
                 @foreach ($paths as $path)
                     <article class="ufm-uni-picker__card">
                         @if ($field->isImagePath($path))
-                            <button type="button" class="ufm-uni-picker__preview" x-on:click="preview = { url: {{ \Illuminate\Support\Js::from($field->previewUrl($path)) }}, name: {{ \Illuminate\Support\Js::from(basename($path)) }} }" aria-label="Preview {{ basename($path) }}">
+                            <button type="button" class="ufm-uni-picker__preview" x-on:click="preview = { url: {{ \Illuminate\Support\Js::from($field->previewUrl($path)) }}, name: {{ \Illuminate\Support\Js::from(basename($path)) }} }" aria-label="{{ __('filament-file-manager::file-manager.preview_file', ['name' => basename($path)]) }}">
                                 <img src="{{ $field->thumbnailUrl($path) }}" alt="" loading="lazy" />
                             </button>
                         @else
                             <span class="ufm-uni-picker__preview"><span class="ufm__document-icon ufm__document-icon--{{ $field->documentKind($path) }}"><span>{{ strtoupper($field->documentKind($path) === 'word' ? 'doc' : $field->documentKind($path)) }}</span></span></span>
                         @endif
                         <span class="ufm-uni-picker__name">{{ basename($path) }}</span>
-                        <button type="button" class="ufm-uni-picker__remove" x-on:click="remove({{ \Illuminate\Support\Js::from($path) }}, {{ $loop->index }})" aria-label="Remove {{ basename($path) }}" title="Remove file">
+                        <button type="button" class="ufm-uni-picker__remove" x-on:click="remove({{ \Illuminate\Support\Js::from($path) }}, {{ $loop->index }})" aria-label="{{ __('filament-file-manager::file-manager.remove_file') }}" title="{{ __('filament-file-manager::file-manager.remove_file') }}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
                         </button>
                     </article>
@@ -88,14 +88,14 @@
         @endif
 
         @if (! $isDisabled() && $isClearable() && $field->isMultiple() && $paths !== [])
-            <button type="button" class="ufm-uni-picker__clear" x-on:click="clear()">Clear selection</button>
+            <button type="button" class="ufm-uni-picker__clear" x-on:click="clear()">{{ __('filament-file-manager::file-manager.clear_selection') }}</button>
         @endif
 
         @if ($hasLibrary)
-            <div x-show="pickerOpen" x-cloak x-on:keydown.escape.window="pickerOpen = false" class="ufm-picker__modal" role="dialog" aria-modal="true" aria-label="Choose a file">
+            <div x-show="pickerOpen" x-cloak x-on:keydown.escape.window="pickerOpen = false" class="ufm-picker__modal" role="dialog" aria-modal="true" aria-label="{{ $field->isMultiple() ? __('filament-file-manager::file-manager.choose_files') : __('filament-file-manager::file-manager.choose_file') }}">
                 <div class="ufm-picker__backdrop" x-on:click="pickerOpen = false"></div>
                 <div class="ufm-picker__dialog">
-                    <div class="ufm-picker__header"><div><strong>Choose {{ $field->isMultiple() ? 'files' : 'a file' }}</strong><span>Select {{ $field->isMultiple() ? 'up to '.$remainingUploadSlots.' files' : 'a file' }} from your library.</span></div><button type="button" x-on:click="pickerOpen = false" aria-label="Close file picker">×</button></div>
+                    <div class="ufm-picker__header"><div><strong>{{ $field->isMultiple() ? __('filament-file-manager::file-manager.choose_files') : __('filament-file-manager::file-manager.choose_file') }}</strong><span>{{ $field->isMultiple() ? trans_choice('filament-file-manager::file-manager.select_up_to_files', $remainingUploadSlots, ['count' => $remainingUploadSlots]) : __('filament-file-manager::file-manager.choose_file') }}</span></div><button type="button" x-on:click="pickerOpen = false" aria-label="{{ __('filament-file-manager::file-manager.close_file_picker') }}">×</button></div>
                     <livewire:unifile-manager.file-picker-explorer :picker-id="$pickerId" :multiple="$field->isMultiple()" :max-files="$remainingUploadSlots" :directory="$directory" :storage-area="$storageArea" :allowed-mime-types="$field->getAllowedMimeTypes()" :key="$pickerId.'-explorer-'.count($paths)" />
                 </div>
             </div>

@@ -174,7 +174,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
         if (count($this->uploads) > $maximum) {
             $this->reset('uploads');
-            $this->addError('uploads', sprintf('You may upload a maximum of %d files at once.', $maximum));
+            $this->addError('uploads', __('filament-file-manager::file-manager.too_many_files', ['count' => $maximum]));
 
             return;
         }
@@ -213,16 +213,16 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
     public function rejectTooManyFiles(int $count): void
     {
         $this->reset('uploads');
-        $this->addError('uploads', sprintf('You selected %d files. The maximum is %d files.', $count, $this->maximumUploadFiles()));
+        $this->addError('uploads', __('filament-file-manager::file-manager.selected_too_many_files', ['selected' => $count, 'count' => $this->maximumUploadFiles()]));
     }
 
     public function deleteUploadedPreviewAction(): Action
     {
         return Action::make('deleteUploadedPreview')
             ->requiresConfirmation()
-            ->modalHeading('Delete uploaded file?')
-            ->modalDescription('This permanently deletes the file from your library.')
-            ->modalSubmitActionLabel('Delete file')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_uploaded_file_heading'))
+            ->modalDescription(__('filament-file-manager::file-manager.delete_uploaded_file_description'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_file'))
             ->color('danger')
             ->action(function (array $arguments): void {
                 $path = $arguments['path'] ?? null;
@@ -237,9 +237,9 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
     {
         return Action::make('deleteAllUploadedPreviews')
             ->requiresConfirmation()
-            ->modalHeading('Delete all these uploads?')
-            ->modalDescription('This permanently deletes every file currently listed in this upload window.')
-            ->modalSubmitActionLabel('Delete all files')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_all_uploads_heading'))
+            ->modalDescription(__('filament-file-manager::file-manager.delete_all_uploads_description'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_all'))
             ->color('danger')
             ->action(function (): void {
                 $this->deleteAllUploadedPreviews();
@@ -283,7 +283,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         }
 
         if ($this->selectionLimitReached()) {
-            $this->selectionMessage = sprintf('You can select up to %d file%s in this field.', $this->maxFiles, $this->maxFiles === 1 ? '' : 's');
+            $this->selectionMessage = trans_choice('filament-file-manager::file-manager.select_up_to_files', $this->maxFiles, ['count' => $this->maxFiles]);
 
             return;
         }
@@ -436,7 +436,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         try {
             if (! $this->canUpload()) {
                 throw ValidationException::withMessages([
-                    'uploads' => 'Use or remove the selected files before uploading more.',
+                    'uploads' => __('filament-file-manager::file-manager.use_or_remove_selected'),
                 ]);
             }
 
@@ -450,7 +450,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
             if (! $this->uploadsUseAllowedMimeTypes($uploads)) {
                 throw ValidationException::withMessages([
-                    'uploads' => 'One or more selected files are not supported by this field.',
+                    'uploads' => __('filament-file-manager::file-manager.unsupported_field_files'),
                 ]);
             }
 
@@ -473,8 +473,8 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
             $this->uploadedPreviewFiles = array_values(array_merge($uploadedPreviewFiles, $this->uploadedPreviewFiles));
             $this->selectUploadedPaths($uploadedPaths);
             $this->uploadMessage = count($uploadedPaths) === 1
-                ? basename($uploadedPaths[0]).' uploaded.'
-                : sprintf('%d files uploaded.', count($uploadedPaths));
+                ? __('filament-file-manager::file-manager.file_uploaded_body', ['name' => basename($uploadedPaths[0])])
+                : __('filament-file-manager::file-manager.files_uploaded_body', ['count' => count($uploadedPaths)]);
             $this->refreshItems();
             $this->resetPickerPagination();
         } catch (ValidationException $exception) {
@@ -482,7 +482,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         } catch (Throwable $exception) {
             report($exception);
             $this->reset('uploads');
-            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : 'The files could not be uploaded. Please try again.');
+            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.upload_failed'));
         }
     }
 
@@ -506,16 +506,16 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
             Notification::make()
                 ->success()
-                ->title('Uploaded file deleted')
-                ->body('The file was removed from your library.')
+                ->title(__('filament-file-manager::file-manager.uploaded_file_deleted'))
+                ->body(__('filament-file-manager::file-manager.uploaded_file_deleted_body'))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
 
             Notification::make()
                 ->danger()
-                ->title('Delete failed')
-                ->body('The uploaded file could not be deleted. Please try again.')
+                ->title(__('filament-file-manager::file-manager.delete_failed'))
+                ->body(__('filament-file-manager::file-manager.delete_failed_body'))
                 ->send();
         }
     }
@@ -550,10 +550,10 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
         Notification::make()
             ->{$failed === 0 ? 'success' : 'warning'}()
-            ->title($failed === 0 ? 'Uploaded files deleted' : 'Some uploads were not deleted')
+            ->title($failed === 0 ? __('filament-file-manager::file-manager.uploaded_files_deleted') : __('filament-file-manager::file-manager.some_uploads_not_deleted'))
             ->body($failed === 0
-                ? 'All files listed in this upload window were deleted.'
-                : 'Some files could not be deleted. They remain listed.')
+                ? __('filament-file-manager::file-manager.uploaded_files_deleted_body')
+                : __('filament-file-manager::file-manager.some_uploads_not_deleted_body'))
             ->send();
     }
 

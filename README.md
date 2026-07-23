@@ -21,6 +21,7 @@ media.
 - [UniFilePicker](#unifilepicker)
 - [Uploads, previews, and thumbnails](#uploads-previews-and-thumbnails)
 - [Configuration](#configuration)
+- [Translations](#translations)
 - [Styling and assets](#styling-and-assets)
 - [Access control and storage](#access-control-and-storage)
 - [Screenshots](#screenshots)
@@ -302,6 +303,20 @@ first**. Their choice is remembered for the current session.
 `file_picker_manager_url` is retained only for legacy integrations. It is `null`
 by default because panel URLs vary by application. A field can override it with
 `->managerUrl('/custom-file-manager')`; this does not open a new tab.
+
+## Translations
+
+UniFileManager uses Laravel's namespaced translations for File Manager and
+UniFilePicker labels, dialogs, upload feedback, and notifications. English is
+included by default. Publish the file before adding another locale:
+
+```bash
+php artisan vendor:publish --tag=filament-file-manager-translations
+```
+
+For example, add French translations in
+`lang/vendor/filament-file-manager/fr/file-manager.php`. Laravel selects the
+package strings using your application's active locale.
 
 ## Styling and assets
 

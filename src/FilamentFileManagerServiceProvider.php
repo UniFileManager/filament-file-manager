@@ -56,7 +56,12 @@ final class FilamentFileManagerServiceProvider extends ServiceProvider
         ], 'filament-file-manager-config');
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'filament-file-manager');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'filament-file-manager');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+        $this->publishes([
+            __DIR__.'/../resources/lang' => $this->app->langPath('vendor/filament-file-manager'),
+        ], 'filament-file-manager-translations');
 
         Livewire::component('unifile-manager.file-picker-explorer', FilePickerExplorer::class);
         Livewire::component('unifile-manager.uni-file-picker-uploader', UniFilePickerUploader::class);

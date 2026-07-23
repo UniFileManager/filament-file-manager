@@ -9,20 +9,20 @@
         <section class="ufm__hero">
             <div class="ufm__hero-main">
                 <div>
-                    <p class="ufm__eyebrow">File library</p>
+                    <p class="ufm__eyebrow">{{ __('filament-file-manager::file-manager.file_library') }}</p>
                     <div class="ufm__title-row">
-                        <h1 class="ufm__title">{{ $path === '' ? 'Main Library' : basename($path) }}</h1>
+                        <h1 class="ufm__title">{{ $path === '' ? __('filament-file-manager::file-manager.main_library') : basename($path) }}</h1>
                     </div>
-                    <nav class="ufm__breadcrumb" aria-label="Current folder">
+                    <nav class="ufm__breadcrumb" aria-label="{{ __('filament-file-manager::file-manager.current_folder') }}">
                         @if ($path !== '')
-                            <button type="button" wire:click="up" class="ufm__breadcrumb-back" aria-label="Go to parent folder" title="Back">
+                            <button type="button" wire:click="up" class="ufm__breadcrumb-back" aria-label="{{ __('filament-file-manager::file-manager.go_to_parent_folder') }}" title="{{ __('filament-file-manager::file-manager.go_to_parent_folder') }}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14.5 5-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
                             <span class="ufm__breadcrumb-separator" aria-hidden="true">/</span>
                         @endif
-                        <button type="button" wire:click="open('')" aria-label="Open main library">
+                        <button type="button" wire:click="open('')" aria-label="{{ __('filament-file-manager::file-manager.open_main_library') }}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9Z" stroke-linejoin="round"/></svg>
-                            <span>Main Library</span>
+                            <span>{{ __('filament-file-manager::file-manager.main_library') }}</span>
                         </button>
                         @if ($path !== '')
                             @php
@@ -77,16 +77,16 @@
                             @else
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round"/></svg>
                             @endif
-                            <span class="ufm__storage-indicator-label">Storage</span>
+                            <span class="ufm__storage-indicator-label">{{ __('filament-file-manager::file-manager.storage') }}</span>
                             <span>{{ $this->availableStorageAreas()[$storageArea] }}</span>
                         </span>
                     @endif
-                    <button type="button" x-on:click="uploadModal = true" class="ufm__button ufm__button--primary">Upload files</button>
+                    <button type="button" x-on:click="uploadModal = true" class="ufm__button ufm__button--primary">{{ __('filament-file-manager::file-manager.upload_files') }}</button>
                 </div>
             </div>
         </section>
 
-        <div x-show="uploadModal" x-cloak x-on:keydown.escape.window="$wire.closeUploadModal(); uploadModal = false" class="ufm__upload-modal" role="dialog" aria-modal="true" aria-label="Upload files">
+        <div x-show="uploadModal" x-cloak x-on:keydown.escape.window="$wire.closeUploadModal(); uploadModal = false" class="ufm__upload-modal" role="dialog" aria-modal="true" aria-label="{{ __('filament-file-manager::file-manager.upload_files') }}">
             <div class="ufm__preview-backdrop" x-on:click="$wire.closeUploadModal(); uploadModal = false"></div>
                 <div class="ufm__upload-dialog">
                 <div class="ufm__preview-header">

@@ -5,18 +5,18 @@
     <div class="ufm-picker-explorer__toolbar">
         <div class="ufm-picker-explorer__location">
             @if ($path !== $directory)
-                <button type="button" wire:click="up" aria-label="Go to parent folder">
+                <button type="button" wire:click="up" aria-label="{{ __('filament-file-manager::file-manager.go_to_parent_folder') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             @endif
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z" stroke-linejoin="round"/></svg>
-            <span>{{ $path === '' ? 'Main Library' : $path }}</span>
+            <span>{{ $path === '' ? __('filament-file-manager::file-manager.main_library') : $path }}</span>
         </div>
 
         <div class="ufm-picker-explorer__toolbar-actions">
             <label class="ufm-picker-explorer__search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
-                <input wire:model.live.debounce.200ms="search" type="search" placeholder="Search this folder" />
+                <input wire:model.live.debounce.200ms="search" type="search" placeholder="{{ __('filament-file-manager::file-manager.search_this_folder') }}" />
             </label>
             <div class="ufm-picker-explorer__options">
                 <button type="button" class="ufm-picker-explorer__icon-button" x-on:click="optionsOpen = ! optionsOpen" x-bind:aria-expanded="optionsOpen" aria-label="{{ $this->canChooseItemLayout() ? 'Item layout and sort options' : 'Sort options' }}">
@@ -24,19 +24,19 @@
                 </button>
                 <div x-show="optionsOpen" x-cloak x-on:click.outside="optionsOpen = false" class="ufm-picker-explorer__options-menu">
                     @if ($this->canChooseItemLayout())
-                        <p>Item layout</p>
-                        <button type="button" wire:click="setDisplayMode('separate')" aria-pressed="{{ $displayMode === 'separate' ? 'true' : 'false' }}" @class(['is-active' => $displayMode === 'separate'])>Folders first</button>
-                        <button type="button" wire:click="setDisplayMode('all')" aria-pressed="{{ $displayMode === 'all' ? 'true' : 'false' }}" @class(['is-active' => $displayMode === 'all'])>All items together</button>
+                        <p>{{ __('filament-file-manager::file-manager.item_layout') }}</p>
+                        <button type="button" wire:click="setDisplayMode('separate')" aria-pressed="{{ $displayMode === 'separate' ? 'true' : 'false' }}" @class(['is-active' => $displayMode === 'separate'])>{{ __('filament-file-manager::file-manager.folders_first') }}</button>
+                        <button type="button" wire:click="setDisplayMode('all')" aria-pressed="{{ $displayMode === 'all' ? 'true' : 'false' }}" @class(['is-active' => $displayMode === 'all'])>{{ __('filament-file-manager::file-manager.all_items_together') }}</button>
                         <hr />
                     @endif
-                    <p>Sort by</p>
-                    <select wire:model.live="sortBy" aria-label="Sort picker items"><option value="name">Name</option><option value="modified_at">Last modified</option><option value="type">Type</option></select>
-                    <button type="button" wire:click="toggleSortDirection">{{ $sortDirection === 'asc' ? 'Ascending' : 'Descending' }}</button>
+                    <p>{{ __('filament-file-manager::file-manager.sort_by') }}</p>
+                    <select wire:model.live="sortBy" aria-label="{{ __('filament-file-manager::file-manager.sort_by') }}"><option value="name">{{ __('filament-file-manager::file-manager.name') }}</option><option value="modified_at">{{ __('filament-file-manager::file-manager.last_modified') }}</option><option value="type">{{ __('filament-file-manager::file-manager.type') }}</option></select>
+                    <button type="button" wire:click="toggleSortDirection">{{ $sortDirection === 'asc' ? __('filament-file-manager::file-manager.ascending') : __('filament-file-manager::file-manager.descending') }}</button>
                 </div>
             </div>
             <button type="button" class="ufm-picker-explorer__upload-button" x-on:click="uploadModal = true" @disabled(! $this->canUpload()) title="{{ $this->canUpload() ? 'Upload files' : 'Use or remove selected files before uploading more' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 20h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Upload
+                {{ __('filament-file-manager::file-manager.upload') }}
             </button>
         </div>
     </div>
@@ -44,7 +44,7 @@
     @if ($displayMode === 'separate')
         <div class="ufm-picker-explorer__content">
             <section class="ufm-picker-explorer__section">
-                <h3>Folders</h3>
+                <h3>{{ __('filament-file-manager::file-manager.folders') }}</h3>
                 @if ($this->paginatedFolders->total() > 0)
                     <div class="ufm-picker-explorer__grid">
                         @foreach ($this->paginatedFolders->items() as $item)
@@ -53,12 +53,12 @@
                     </div>
                     @include('filament-file-manager::components.pagination', ['pagination' => $this->paginatedFolders, 'pageName' => 'pickerFoldersPage'])
                 @else
-                    <p class="ufm-picker-explorer__empty-row">This folder has no subfolders.</p>
+                    <p class="ufm-picker-explorer__empty-row">{{ __('filament-file-manager::file-manager.no_subfolders') }}</p>
                 @endif
             </section>
 
             <section class="ufm-picker-explorer__section">
-                <h3>Files</h3>
+                <h3>{{ __('filament-file-manager::file-manager.files') }}</h3>
                 @if ($this->paginatedFiles->total() > 0)
                     <div class="ufm-picker-explorer__grid">
                         @foreach ($this->paginatedFiles->items() as $item)
@@ -67,7 +67,7 @@
                     </div>
                     @include('filament-file-manager::components.pagination', ['pagination' => $this->paginatedFiles, 'pageName' => 'pickerFilesPage'])
                 @else
-                    <p class="ufm-picker-explorer__empty-row">{{ $search === '' ? 'This folder has no files.' : 'No files match your search.' }}</p>
+                    <p class="ufm-picker-explorer__empty-row">{{ $search === '' ? __('filament-file-manager::file-manager.no_files') : __('filament-file-manager::file-manager.no_matching_files') }}</p>
                 @endif
             </section>
         </div>
@@ -83,37 +83,37 @@
     @else
         <div class="ufm-picker-explorer__empty">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z"/></svg>
-            <strong>{{ $search === '' ? 'This folder is empty' : 'No files found' }}</strong>
-            <span>{{ $search === '' ? 'Upload a file or open another folder.' : 'Try a different search term.' }}</span>
+            <strong>{{ $search === '' ? __('filament-file-manager::file-manager.this_folder_is_empty') : __('filament-file-manager::file-manager.no_files_found') }}</strong>
+            <span>{{ $search === '' ? __('filament-file-manager::file-manager.upload_or_open_folder') : __('filament-file-manager::file-manager.try_different_search') }}</span>
         </div>
     @endif
 
     @if ($multiple)
         <footer class="ufm-picker-explorer__selection-footer">
             <div><strong>{{ count($selectedPaths) }} of {{ $maxFiles }} selected</strong>@if ($selectionMessage)<span>{{ $selectionMessage }}</span>@endif</div>
-            <button type="button" wire:click="confirmSelection" @disabled($selectedPaths === [])>Use selected {{ count($selectedPaths) === 1 ? 'file' : 'files' }}</button>
+            <button type="button" wire:click="confirmSelection" @disabled($selectedPaths === [])>{{ __('filament-file-manager::file-manager.use_selected', ['count' => count($selectedPaths), 'files' => count($selectedPaths) === 1 ? __('filament-file-manager::file-manager.file') : __('filament-file-manager::file-manager.files')]) }}</button>
         </footer>
     @endif
 
-    <div x-show="uploadModal" x-cloak x-on:keydown.escape.window="uploadModal = false" class="ufm-picker-upload" role="dialog" aria-modal="true" aria-label="Upload files">
+    <div x-show="uploadModal" x-cloak x-on:keydown.escape.window="uploadModal = false" class="ufm-picker-upload" role="dialog" aria-modal="true" aria-label="{{ __('filament-file-manager::file-manager.upload_files') }}">
         <div class="ufm-picker-upload__backdrop" x-on:click="uploadModal = false"></div>
         <div class="ufm-picker-upload__dialog">
-            <div class="ufm-picker-upload__header"><div><strong>Upload files</strong><span>Choose or drop up to {{ $this->maximumUploadFiles() }} files. Uploads start automatically.</span></div><button type="button" x-on:click="uploadModal = false" aria-label="Close upload dialog">×</button></div>
+            <div class="ufm-picker-upload__header"><div><strong>{{ __('filament-file-manager::file-manager.upload_files') }}</strong><span>{{ __('filament-file-manager::file-manager.choose_or_drop_files') }}</span></div><button type="button" x-on:click="uploadModal = false" aria-label="{{ __('filament-file-manager::file-manager.close_upload_dialog') }}">×</button></div>
             <label class="ufm-picker-upload__dropzone" x-bind:class="{ 'is-dragging': uploadDragging }" x-on:dragover.prevent="uploadDragging = true" x-on:dragleave.prevent="uploadDragging = false" x-on:drop.prevent="uploadDragging = false; if ($event.dataTransfer.files.length > maxUploadFiles) { $wire.rejectTooManyFiles($event.dataTransfer.files.length); return; } $refs.pickerUploadInput.files = $event.dataTransfer.files; $refs.pickerUploadInput.dispatchEvent(new Event('change', { bubbles: true }))">
                 <input x-ref="pickerUploadInput" type="file" wire:model="uploads" accept="{{ $this->acceptedFileTypes() }}" multiple @disabled(! $this->canUpload()) x-on:livewire-upload-start="uploading = true; uploadProgress = 0" x-on:livewire-upload-progress="uploadProgress = $event.detail.progress" x-on:livewire-upload-finish="uploading = false; uploadProgress = 100" x-on:livewire-upload-error="uploading = false" x-on:change.capture="if ($event.target.files.length > maxUploadFiles) { $event.stopImmediatePropagation(); $wire.rejectTooManyFiles($event.target.files.length); $event.target.value = ''; }" class="ufm__visually-hidden" />
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 18.5h10a4 4 0 0 0 .77-7.93A5.8 5.8 0 0 0 6.7 9.2 4.7 4.7 0 0 0 7 18.5Z" stroke-linecap="round"/><path d="m12 15.5 0-7m0 0-2.5 2.5M12 8.5l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <strong>Choose files or drag &amp; drop them here</strong>
-                <span>Uploads start automatically · up to {{ round(config('filament-file-manager.max_upload_size') / 1024) }} MB each</span>
-                <em>Browse files</em>
+                <strong>{{ __('filament-file-manager::file-manager.choose_or_drop_files') }}</strong>
+                <span>{{ __('filament-file-manager::file-manager.uploads_start_automatically') }}</span>
+                <em>{{ __('filament-file-manager::file-manager.browse_files') }}</em>
             </label>
             @error('uploads') <p class="ufm-picker-upload__error">{{ $message }}</p> @enderror
-            <div x-show="uploading" x-cloak class="ufm-picker-upload__progress"><div><span>Uploading files…</span><span x-text="uploadProgress + '%'">0%</span></div><i><b x-bind:style="'width: ' + uploadProgress + '%' "></b></i></div>
+            <div x-show="uploading" x-cloak class="ufm-picker-upload__progress"><div><span>{{ __('filament-file-manager::file-manager.uploading_files') }}</span><span x-text="uploadProgress + '%'">0%</span></div><i><b x-bind:style="'width: ' + uploadProgress + '%' "></b></i></div>
             @if ($uploadMessage)<p class="ufm-picker-upload__success">{{ $uploadMessage }}</p>@endif
             @if ($uploadedPreviewFiles !== [])
-                <section class="ufm-picker-upload__review" aria-label="Uploaded files">
+                <section class="ufm-picker-upload__review" aria-label="{{ __('filament-file-manager::file-manager.uploaded_files') }}">
                     <div class="ufm-picker-upload__review-heading">
-                        <strong>{{ count($uploadedPreviewFiles) === 1 ? 'Uploaded file' : 'Uploaded files' }}</strong>
-                        <button type="button" wire:click="mountAction('deleteAllUploadedPreviews')" class="ufm-picker-upload__delete-all">Delete all</button>
+                        <strong>{{ count($uploadedPreviewFiles) === 1 ? __('filament-file-manager::file-manager.uploaded_file') : __('filament-file-manager::file-manager.uploaded_files') }}</strong>
+                        <button type="button" wire:click="mountAction('deleteAllUploadedPreviews')" class="ufm-picker-upload__delete-all">{{ __('filament-file-manager::file-manager.delete_all') }}</button>
                     </div>
                     <div class="ufm-picker-upload__preview-grid">
                         @foreach ($uploadedPreviewFiles as $uploadedFile)
