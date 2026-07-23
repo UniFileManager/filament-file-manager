@@ -11,6 +11,7 @@ The project follows [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Optional request-aware `StorageAreaResolver` support for tenant-specific disks and roots without changing standard single-tenant configuration.
+- File and folder move actions with eligible destination filtering.
 
 ## 0.3.1 - 2026-07-23
 

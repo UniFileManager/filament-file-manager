@@ -12,6 +12,7 @@ use Filament\Support\Enums\Width;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -52,6 +53,14 @@ final class FileManager extends Page
     public ?string $renamingPath = null;
 
     public string $renamingName = '';
+
+    #[Locked]
+    public ?string $movingPath = null;
+
+    #[Locked]
+    public string $moveDestinationPath = '';
+
+    public string $moveSearch = '';
 
     public bool $isCreatingDirectory = false;
 
@@ -449,6 +458,156 @@ final class FileManager extends Page
             });
     }
 
+    public function beginMove(string $path): void
+    {
+        if (! in_array($path, array_column($this->items, 'path'), true)) {
+            return;
+        }
+
+        try {
+            $this->manager()->moveDestinations(auth()->user(), $path);
+            $this->movingPath = $path;
+            $this->moveDestinationPath = '';
+            $this->moveSearch = '';
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->danger()
+                ->title('Move unavailable')
+                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : 'This item cannot be moved right now.')
+                ->send();
+        }
+    }
+
+    public function cancelMove(): void
+    {
+        $this->movingPath = null;
+        $this->moveDestinationPath = '';
+        $this->moveSearch = '';
+    }
+
+    public function openMoveDestination(string $path): void
+    {
+        if (! in_array($path, array_column($this->moveDestinationFolders, 'path'), true)) {
+            return;
+        }
+
+        $this->moveDestinationPath = $path;
+        $this->moveSearch = '';
+    }
+
+    public function goToMoveDestination(string $path): void
+    {
+        if ($this->movingPath === null) {
+            return;
+        }
+
+        if ($this->itemType($this->movingPath) === 'directory'
+            && ($path === $this->movingPath || str_starts_with($path.'/', $this->movingPath.'/'))) {
+            return;
+        }
+
+        try {
+            $this->manager()->list(auth()->user(), $path);
+            $this->moveDestinationPath = $path;
+            $this->moveSearch = '';
+        } catch (Throwable $exception) {
+            report($exception);
+        }
+    }
+
+    public function upMoveDestination(): void
+    {
+        $segments = explode('/', $this->moveDestinationPath);
+        array_pop($segments);
+        $this->goToMoveDestination(implode('/', array_filter($segments)));
+    }
+
+    /** @return list<array{name: string, path: string, type: 'directory'|'file', size?: int, modified_at?: int, mime_type?: string}> */
+    public function getMoveDestinationFoldersProperty(): array
+    {
+        if ($this->movingPath === null) {
+            return [];
+        }
+
+        try {
+            $sourceIsDirectory = $this->itemType($this->movingPath) === 'directory';
+            $search = mb_strtolower(trim($this->moveSearch));
+
+            return array_values(array_filter(
+                $this->manager()->list(auth()->user(), $this->moveDestinationPath),
+                function (array $item) use ($sourceIsDirectory, $search): bool {
+                    if ($item['type'] !== 'directory') {
+                        return false;
+                    }
+
+                    if ($sourceIsDirectory && ($item['path'] === $this->movingPath || str_starts_with($item['path'].'/', $this->movingPath.'/'))) {
+                        return false;
+                    }
+
+                    return $search === '' || str_contains(mb_strtolower($item['name']), $search);
+                },
+            ));
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return [];
+        }
+    }
+
+    public function canMoveToCurrentFolder(): bool
+    {
+        if ($this->movingPath === null) {
+            return false;
+        }
+
+        try {
+            return $this->manager()->canMoveTo(auth()->user(), $this->movingPath, $this->moveDestinationPath);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
+    }
+
+    public function moveToCurrentFolder(FileManagerService $fileManager): void
+    {
+        if ($this->movingPath === null || ! $this->canMoveToCurrentFolder()) {
+            return;
+        }
+
+        $source = $this->movingPath;
+        $destination = $this->moveDestinationPath;
+        $type = $this->itemType($source);
+        $itemName = basename($source);
+        $fileManager = $fileManager->forArea($this->storageArea);
+
+        try {
+            $target = $fileManager->move(auth()->user(), $source, $destination);
+            $this->selectedPaths = array_values(array_filter(
+                $this->selectedPaths,
+                static fn (string $selectedPath): bool => $selectedPath !== $source,
+            ));
+            $this->cancelMove();
+            $this->refreshItems();
+
+            Notification::make()
+                ->success()
+                ->title($type === 'directory' ? 'Folder moved' : 'File moved')
+                ->body(sprintf('"%s" moved to %s.', $itemName, dirname($target) === '.' ? 'Main Library' : '"'.dirname($target).'"'))
+                ->send();
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->danger()
+                ->title('Move failed')
+                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : 'The item could not be moved. Please try again.')
+                ->send();
+        }
+    }
+
     public function toggleSelection(string $path): void
     {
         if (! in_array($path, array_column($this->items, 'path'), true)) {
@@ -829,6 +988,17 @@ final class FileManager extends Page
         }
 
         return false;
+    }
+
+    private function itemType(string $path): string
+    {
+        foreach ($this->items as $item) {
+            if ($item['path'] === $path) {
+                return $item['type'];
+            }
+        }
+
+        return 'item';
     }
 
     private function manager(): FileManagerService

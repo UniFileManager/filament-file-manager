@@ -57,6 +57,47 @@ it('requires an existing folder as a move destination', function (): void {
     app(FileManager::class)->move((object) ['id' => 1], 'document.txt', 'missing-folder');
 })->throws(InvalidFilePath::class, 'The destination must be an existing folder.');
 
+it('moves a file into an eligible destination folder', function (): void {
+    Storage::disk('testing')->put('tenant-a/document.txt', 'contents');
+    Storage::disk('testing')->makeDirectory('tenant-a/archive');
+
+    $path = app(FileManager::class)->move((object) ['id' => 1], 'document.txt', 'archive');
+
+    expect($path)->toBe('archive/document.txt')
+        ->and(Storage::disk('testing')->exists('tenant-a/document.txt'))->toBeFalse()
+        ->and(Storage::disk('testing')->exists('tenant-a/archive/document.txt'))->toBeTrue();
+});
+
+it('identifies whether a folder is a valid move destination', function (): void {
+    Storage::disk('testing')->put('tenant-a/document.txt', 'contents');
+    Storage::disk('testing')->makeDirectory('tenant-a/archive');
+    Storage::disk('testing')->makeDirectory('tenant-a/occupied');
+    Storage::disk('testing')->put('tenant-a/occupied/document.txt', 'contents');
+
+    $manager = app(FileManager::class);
+
+    expect($manager->canMoveTo((object) ['id' => 1], 'document.txt', 'archive'))->toBeTrue()
+        ->and($manager->canMoveTo((object) ['id' => 1], 'document.txt', ''))->toBeFalse()
+        ->and($manager->canMoveTo((object) ['id' => 1], 'document.txt', 'occupied'))->toBeFalse();
+});
+
+it('offers only valid destination folders for a move', function (): void {
+    Storage::disk('testing')->makeDirectory('tenant-a/projects/current/child');
+    Storage::disk('testing')->makeDirectory('tenant-a/archive');
+    Storage::disk('testing')->makeDirectory('tenant-a/finished');
+    Storage::disk('testing')->put('tenant-a/archive/current', 'existing');
+
+    $destinations = app(FileManager::class)->moveDestinations((object) ['id' => 1], 'projects/current');
+
+    expect($destinations)
+        ->toHaveKey('')
+        ->toHaveKey('finished')
+        ->not->toHaveKey('archive')
+        ->not->toHaveKey('projects')
+        ->not->toHaveKey('projects/current')
+        ->not->toHaveKey('projects/current/child');
+});
+
 it('does not delete a folder that contains files or folders', function (): void {
     Storage::disk('testing')->put('tenant-a/occupied/document.txt', 'contents');
     Storage::disk('testing')->makeDirectory('tenant-a/occupied/nested');

@@ -240,6 +240,9 @@
                                 <button type="button" class="ufm__file-action" wire:click="beginRename({{ \Illuminate\Support\Js::from($folder['path']) }})" aria-label="Rename folder" title="Rename folder">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
+                                <button type="button" class="ufm__file-action" wire:click="beginMove({{ \Illuminate\Support\Js::from($folder['path']) }})" aria-label="Move folder" title="Move folder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
                                 <button type="button" @class(['ufm__file-action', 'is-selected' => in_array($folder['path'], $selectedPaths, true)]) wire:click="toggleSelection({{ \Illuminate\Support\Js::from($folder['path']) }})" aria-pressed="{{ in_array($folder['path'], $selectedPaths, true) ? 'true' : 'false' }}" aria-label="{{ in_array($folder['path'], $selectedPaths, true) ? 'Deselect' : 'Select' }} folder" title="{{ in_array($folder['path'], $selectedPaths, true) ? 'Deselect folder' : 'Select folder' }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
@@ -356,6 +359,9 @@
                                     <button type="button" class="ufm__file-action" wire:click="beginRename({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="Rename file" title="Rename file">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
+                                    <button type="button" class="ufm__file-action" wire:click="beginMove({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="Move file" title="Move file">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </button>
                                     @if ($this->isImage($file))
                                         <button type="button" class="ufm__file-action" x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path'])]) }}" aria-label="Preview image" title="Preview image">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
@@ -370,6 +376,9 @@
                                 @else
                                     <button type="button" class="ufm__file-action" wire:click="beginRename({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="Rename folder" title="Rename folder">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </button>
+                                    <button type="button" class="ufm__file-action" wire:click="beginMove({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="Move folder" title="Move folder">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
                                     <button type="button" @class(['ufm__file-action', 'is-selected' => in_array($file['path'], $selectedPaths, true)]) wire:click="toggleSelection({{ \Illuminate\Support\Js::from($file['path']) }})" aria-pressed="{{ in_array($file['path'], $selectedPaths, true) ? 'true' : 'false' }}" aria-label="{{ in_array($file['path'], $selectedPaths, true) ? 'Deselect' : 'Select' }} folder" title="{{ in_array($file['path'], $selectedPaths, true) ? 'Deselect folder' : 'Select folder' }}">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -392,6 +401,90 @@
                 </div>
             @endif
         </section>
+
+        @if ($movingPath !== null)
+            @php
+                $moveBreadcrumbPath = '';
+                $moveBreadcrumbSegments = array_values(array_filter(explode('/', $moveDestinationPath)));
+                $canMoveToCurrentFolder = $this->canMoveToCurrentFolder();
+            @endphp
+            <div class="ufm__move-modal" role="dialog" aria-modal="true" aria-labelledby="ufm-move-title" wire:keydown.escape.window="cancelMove">
+                <button type="button" class="ufm__move-backdrop" wire:click="cancelMove" aria-label="Close move dialog"></button>
+                <section class="ufm__move-dialog">
+                    <header class="ufm__move-header">
+                        <div>
+                            <h2 id="ufm-move-title">Move “{{ basename($movingPath) }}”</h2>
+                            <p>Choose a folder, then confirm the destination.</p>
+                        </div>
+                        <button type="button" wire:click="cancelMove" class="ufm__move-close" aria-label="Close move dialog">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+                        </button>
+                    </header>
+
+                    <div class="ufm__move-toolbar">
+                        <nav class="ufm__move-breadcrumb" aria-label="Destination folder">
+                            @if ($moveDestinationPath !== '')
+                                <button type="button" wire:click="upMoveDestination" class="ufm__move-back" aria-label="Go to parent folder" title="Back">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m14.5 5-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            @endif
+                            <button type="button" wire:click="goToMoveDestination('')">Main Library</button>
+                            @foreach ($moveBreadcrumbSegments as $segment)
+                                @php
+                                    $moveBreadcrumbPath = $moveBreadcrumbPath === '' ? $segment : $moveBreadcrumbPath.'/'.$segment;
+                                @endphp
+                                <span aria-hidden="true">/</span>
+                                @if ($loop->last)
+                                    <span aria-current="page">{{ $segment }}</span>
+                                @else
+                                    <button type="button" wire:click="goToMoveDestination({{ \Illuminate\Support\Js::from($moveBreadcrumbPath) }})">{{ $segment }}</button>
+                                @endif
+                            @endforeach
+                        </nav>
+                        <label class="ufm__move-search">
+                            <span class="ufm__visually-hidden">Search folders</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.8"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
+                            <input type="search" wire:model.live.debounce.250ms="moveSearch" placeholder="Search folders" autocomplete="off" />
+                        </label>
+                    </div>
+
+                    <div class="ufm__move-content">
+                        @if (count($this->moveDestinationFolders) > 0)
+                            <div class="ufm__move-folder-grid">
+                                @foreach ($this->moveDestinationFolders as $folder)
+                                    <button type="button" wire:click="openMoveDestination({{ \Illuminate\Support\Js::from($folder['path']) }})" class="ufm__move-folder">
+                                        <span class="ufm__move-folder-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z"/></svg></span>
+                                        <span>{{ $folder['name'] }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="ufm__move-empty">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z"/></svg>
+                                <p>{{ $moveSearch === '' ? 'No folders in this location.' : 'No folders match your search.' }}</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <footer class="ufm__move-footer">
+                        <div>
+                            <span>Destination</span>
+                            <strong>{{ $moveDestinationPath === '' ? 'Main Library' : str_replace('/', ' / ', $moveDestinationPath) }}</strong>
+                            @unless ($canMoveToCurrentFolder)
+                                <small>Choose a different destination.</small>
+                            @endunless
+                        </div>
+                        <div class="ufm__move-footer-actions">
+                            <button type="button" class="ufm__move-cancel" wire:click="cancelMove">Cancel</button>
+                            <button type="button" class="ufm__move-confirm" wire:click="moveToCurrentFolder" @disabled(! $canMoveToCurrentFolder)>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h13m0 0-4-4m4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Move here
+                            </button>
+                        </div>
+                    </footer>
+                </section>
+            </div>
+        @endif
 
         <div x-show="imagePreview" x-cloak x-on:keydown.escape.window="imagePreview = null" class="ufm__preview-modal" role="dialog" aria-modal="true" x-bind:aria-label="imagePreview?.name">
             <div class="ufm__preview-backdrop" x-on:click="imagePreview = null"></div>

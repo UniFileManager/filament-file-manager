@@ -39,8 +39,8 @@ this table.
 
 ## Features
 
-- **File Manager page** — browse folders, upload files, rename items, download
-  files, and delete one or many selected items.
+- **File Manager page** — browse folders, upload files, move or rename items,
+  download files, and delete one or many selected items.
 - **UniFilePicker** — choose one or many files from a focused library modal or
   upload them directly from a Filament form.
 - **Private and public media** — keep application files and public website

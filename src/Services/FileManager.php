@@ -207,6 +207,87 @@ final class FileManager
         return $target;
     }
 
+    public function canMoveTo(mixed $user, string $source, string $destinationDirectory): bool
+    {
+        $source = $this->normalisePath($source);
+        $destinationDirectory = $this->normalisePath($destinationDirectory);
+
+        if ($source === '') {
+            return false;
+        }
+
+        $this->authorize($user, 'move', $source);
+        $this->authorize($user, 'create', $destinationDirectory);
+
+        $sourcePath = $this->absolutePath($source);
+        $destinationPath = $this->absolutePath($destinationDirectory);
+        if (! $this->disk()->exists($sourcePath) || ! $this->disk()->directoryExists($destinationPath)) {
+            return false;
+        }
+
+        if ($this->disk()->directoryExists($sourcePath) && $this->isSameOrDescendantDirectory($destinationDirectory, $source)) {
+            return false;
+        }
+
+        $target = $this->join($destinationDirectory, basename($source));
+
+        if ($this->disk()->directoryExists($sourcePath)) {
+            try {
+                $this->assertDirectoryTreeDepth($sourcePath, $target);
+            } catch (InvalidFilePath) {
+                return false;
+            }
+        }
+
+        return $source !== $target && ! $this->disk()->exists($this->absolutePath($target));
+    }
+
+    /** @return array<string, string> */
+    public function moveDestinations(mixed $user, string $source): array
+    {
+        $source = $this->normalisePath($source);
+        if ($source === '') {
+            throw new InvalidFilePath('The configured root cannot be moved.');
+        }
+
+        $this->authorize($user, 'move', $source);
+        $sourcePath = $this->absolutePath($source);
+        if (! $this->disk()->exists($sourcePath)) {
+            throw new InvalidFilePath('The source item does not exist.');
+        }
+
+        $sourceIsDirectory = $this->disk()->directoryExists($sourcePath);
+        $sourceParent = dirname($source) === '.' ? '' : dirname($source);
+        $thumbnailDirectory = trim((string) config('filament-file-manager.thumbnails.directory'), '/');
+        $destinations = [''];
+
+        foreach ($this->disk()->allDirectories($this->absolutePath('')) as $directory) {
+            $path = $this->relativeFromAbsolute($directory);
+
+            if ($path === $thumbnailDirectory || str_starts_with($path, $thumbnailDirectory.'/')) {
+                continue;
+            }
+
+            $destinations[] = $path;
+        }
+
+        $options = [];
+        foreach ($destinations as $destination) {
+            if ($destination === $sourceParent
+                || ($sourceIsDirectory && $this->isSameOrDescendantDirectory($destination, $source))
+                || ! $this->authorizer->can($user, 'create', $destination)
+                || $this->disk()->exists($this->absolutePath($this->join($destination, basename($source))))) {
+                continue;
+            }
+
+            $options[$destination] = $destination === '' ? 'Main Library' : str_replace('/', ' / ', $destination);
+        }
+
+        asort($options, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $options;
+    }
+
     public function rename(mixed $user, string $source, string $name): string
     {
         $source = $this->normalisePath($source);
