@@ -6,6 +6,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.6.1 - 2026-07-23
+
+### Fixed
+
+- Improved dark mode support for the File Manager, including the "+ New folder" button hover states, image preview path fields, pagination components, and folder move dialogs.
+
 ## 0.6.0 - 2026-07-23
 
 ### Added
