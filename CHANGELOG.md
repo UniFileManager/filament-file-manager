@@ -6,6 +6,21 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.5.0 - 2026-07-23
+
+### Added
+
+- Folder-browser move dialog for files and folders, with breadcrumbs, search, destination validation, and depth protection.
+- File Picker upload dialog actions to delete one or all files uploaded in the current dialog, with confirmation and authorization checks.
+
+### Fixed
+
+- File Picker upload dialog now shows thumbnail cards for newly uploaded images and matching document icons for other supported files, and automatically selects uploaded files.
+
+### Documentation
+
+- README images stay visible on GitHub while being hidden from the Filament plugin directory to avoid duplicate screenshots.
+
 ## 0.4.0 - 2026-07-23
 
 ### Added
