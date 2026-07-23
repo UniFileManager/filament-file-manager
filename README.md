@@ -70,7 +70,7 @@ this table.
 Install the package and publish its configuration:
 
 ```bash
-composer require unifilemanager/filament-file-manager
+composer require unifilemanager/filament-file-manager:"^0.6"
 php artisan vendor:publish --tag=filament-file-manager-config
 ```
 
