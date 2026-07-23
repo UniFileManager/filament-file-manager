@@ -2,7 +2,7 @@
 
 > File management for Laravel Filament.
 
-![UniFileManager package cover](docs/images/uni-file-manager-cover.jpg)
+<img class="filament-hidden" src="docs/images/uni-file-manager-cover.jpg" alt="UniFileManager package cover" />
 
 UniFileManager adds a full file-library experience to Filament. It includes a
 File Manager page for working with files and folders, plus `UniFilePicker` for
@@ -347,51 +347,51 @@ If you are upgrading from an earlier public-disk configuration, follow the
 
 ### File Manager overview
 
-![File Manager overview](docs/screenshots/file-manager-overview.png)
+<img class="filament-hidden" src="docs/screenshots/file-manager-overview.png" alt="File Manager overview" />
 
 ### Browse files and folders
 
-![File Explorer](docs/screenshots/file-explorer.png)
+<img class="filament-hidden" src="docs/screenshots/file-explorer.png" alt="File Explorer" />
 
 ### Upload files
 
-![Upload files modal](docs/screenshots/file-upload-modal.png)
+<img class="filament-hidden" src="docs/screenshots/file-upload-modal.png" alt="Upload files modal" />
 
 ### Image preview and file details
 
-![Image preview and file details](docs/screenshots/image-preview.png)
+<img class="filament-hidden" src="docs/screenshots/image-preview.png" alt="Image preview and file details" />
 
 ### Public and private storage areas
 
-![Public and private storage areas](docs/screenshots/public-and-private-storage.png)
+<img class="filament-hidden" src="docs/screenshots/public-and-private-storage.png" alt="Public and private storage areas" />
 
 ### Item layout and sorting
 
-![Item layout and sorting](docs/screenshots/item-layout-and-sorting.png)
+<img class="filament-hidden" src="docs/screenshots/item-layout-and-sorting.png" alt="Item layout and sorting" />
 
 ### Folders-first layout
 
-![Folders-first layout](docs/screenshots/item-layout-folders-first.png)
+<img class="filament-hidden" src="docs/screenshots/item-layout-folders-first.png" alt="Folders-first layout" />
 
 ### Separate pagination for folders and files
 
-![Separate folder and file pagination](docs/screenshots/separate-pagination.png)
+<img class="filament-hidden" src="docs/screenshots/separate-pagination.png" alt="Separate folder and file pagination" />
 
 ### Bulk delete
 
-![Bulk delete](docs/screenshots/bulk-delete.png)
+<img class="filament-hidden" src="docs/screenshots/bulk-delete.png" alt="Bulk delete" />
 
 ### UniFilePicker
 
-![UniFilePicker field](docs/screenshots/uni-file-picker.png)
+<img class="filament-hidden" src="docs/screenshots/uni-file-picker.png" alt="UniFilePicker field" />
 
 ### Selected files in UniFilePicker
 
-![Selected files in UniFilePicker](docs/screenshots/uni-file-picker-selected-files.png)
+<img class="filament-hidden" src="docs/screenshots/uni-file-picker-selected-files.png" alt="Selected files in UniFilePicker" />
 
 ### Choose files from the library
 
-![File Picker library](docs/screenshots/file-picker-library.png)
+<img class="filament-hidden" src="docs/screenshots/file-picker-library.png" alt="File Picker library" />
 
 </details>
 
