@@ -148,6 +148,18 @@
 .ufm__preview-download:hover { background: var(--ufm-primary); color: #fff; }
 .ufm__preview-download svg { width: .9rem; height: .9rem; }
 
+.ufm-picker-upload__review { border-top: 1px solid var(--ufm-border); padding: .85rem .9rem .95rem; }
+.ufm-picker-upload__review > strong { display: block; margin-bottom: .55rem; color: var(--ufm-text); font-size: .78rem; }
+.ufm-picker-upload__preview-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; }
+.ufm-picker-upload__preview-card { display: grid; min-width: 0; gap: .35rem; overflow: hidden; border: 1px solid var(--ufm-border); border-radius: .5rem; background: #f8fafc; padding: .35rem; color: var(--ufm-text); font-size: .65rem; font-weight: 700; }
+.ufm-picker-upload__preview-card > img { display: block; width: 100%; aspect-ratio: 1; border-radius: .3rem; object-fit: cover; }
+.ufm-picker-upload__preview-card > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ufm-picker-upload__preview-card > .ufm__document-icon { display: grid; width: 100%; aspect-ratio: 1; place-items: end center; border-radius: .3rem; background: #64748b; color: #fff; font-size: .55rem; font-weight: 800; letter-spacing: .04em; overflow: hidden; }
+.ufm-picker-upload__preview-card > .ufm__document-icon span { width: 100%; padding: .3rem 0; background: rgb(0 0 0 / .2); text-align: center; }
+.ufm-picker-upload__preview-card > .ufm__document-icon.ufm__document-icon--pdf { background: #dc2626; }
+.ufm-picker-upload__preview-card > .ufm__document-icon.ufm__document-icon--word { background: #2563eb; }
+.ufm-picker-upload__preview-card > .ufm__document-icon.ufm__document-icon--sheet { background: #16a34a; }
+
 /* Folder browser used by the move dialog. */
 .ufm__move-modal { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 1rem; }
 .ufm__move-backdrop { position: absolute; inset: 0; border: 0; background: rgb(15 23 42 / .62); cursor: default; }

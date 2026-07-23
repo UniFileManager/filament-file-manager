@@ -109,6 +109,24 @@
             @error('uploads') <p class="ufm-picker-upload__error">{{ $message }}</p> @enderror
             <div x-show="uploading" x-cloak class="ufm-picker-upload__progress"><div><span>Uploading files…</span><span x-text="uploadProgress + '%'">0%</span></div><i><b x-bind:style="'width: ' + uploadProgress + '%' "></b></i></div>
             @if ($uploadMessage)<p class="ufm-picker-upload__success">{{ $uploadMessage }}</p>@endif
+            @if ($uploadedPreviewFiles !== [])
+                <section class="ufm-picker-upload__review" aria-label="Uploaded files">
+                    <strong>{{ count($uploadedPreviewFiles) === 1 ? 'Uploaded file' : 'Uploaded files' }}</strong>
+                    <div class="ufm-picker-upload__preview-grid">
+                        @foreach ($uploadedPreviewFiles as $uploadedFile)
+                            <div class="ufm-picker-upload__preview-card">
+                                @if ($uploadedFile['is_image'])
+                                    <img src="{{ $this->thumbnailUrl($uploadedFile['path']) }}" alt="" />
+                                @else
+                                    @php($documentKind = $this->documentKind($uploadedFile))
+                                    <span class="ufm__document-icon ufm__document-icon--{{ $documentKind }}"><span>{{ strtoupper($documentKind === 'word' ? 'doc' : $documentKind) }}</span></span>
+                                @endif
+                                <span title="{{ $uploadedFile['name'] }}">{{ $uploadedFile['name'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </div>
     </div>
 </div>

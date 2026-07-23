@@ -65,6 +65,10 @@ final class FilePickerExplorer extends Component
 
     public ?string $uploadMessage = null;
 
+    /** @var list<array{path: string, name: string, is_image: bool}> */
+    #[Locked]
+    public array $uploadedPreviewFiles = [];
+
     /** @var list<array{name: string, path: string, type: 'directory'|'file', size?: int, modified_at?: int, mime_type?: string}> */
     public array $items = [];
 
@@ -176,7 +180,6 @@ final class FilePickerExplorer extends Component
     {
         $configuredMaximum = max(1, (int) config('filament-file-manager.max_upload_files'));
         $phpMaximum = (int) ini_get('max_file_uploads');
-
         return $phpMaximum > 0 ? min($configuredMaximum, $phpMaximum) : $configuredMaximum;
     }
 
@@ -397,11 +400,19 @@ final class FilePickerExplorer extends Component
             $fileManager->validateUploads($uploads);
 
             $uploadedPaths = [];
+            $uploadedPreviewFiles = [];
             foreach ($uploads as $upload) {
-                $uploadedPaths[] = $fileManager->upload(auth()->user(), $upload, $this->currentPath());
+                $path = $fileManager->upload(auth()->user(), $upload, $this->currentPath());
+                $uploadedPaths[] = $path;
+                $uploadedPreviewFiles[] = [
+                    'path' => $path,
+                    'name' => basename($path),
+                    'is_image' => str_starts_with((string) $upload->getMimeType(), 'image/'),
+                ];
             }
 
             $this->reset('uploads');
+            $this->uploadedPreviewFiles = array_values(array_merge($uploadedPreviewFiles, $this->uploadedPreviewFiles));
             $this->uploadMessage = count($uploadedPaths) === 1
                 ? basename($uploadedPaths[0]).' uploaded.'
                 : sprintf('%d files uploaded.', count($uploadedPaths));
