@@ -6,6 +6,13 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.6.2 - 2026-07-26
+
+- Improved the image preview modal layout.
+- Added image resolution to the preview details panel.
+- Kept preview Download and Rename actions visible for tall images.
+- Fixed long relative path and public URL copy fields.
+
 ## 0.6.1 - 2026-07-23
 
 ### Fixed
