@@ -6,7 +6,7 @@ namespace UniFileManager\FilamentFileManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use UniFileManager\FilamentFileManager\Services\FileManager;
+use UniFileManager\Core\Services\FileManager;
 
 final class FilePreviewController
 {

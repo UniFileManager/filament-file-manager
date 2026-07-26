@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Storage;
-use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
+use UniFileManager\Core\Contracts\StorageAreaResolver;
 use UniFileManager\FilamentFileManager\Filament\Forms\Components\UniFilePicker;
-use UniFileManager\FilamentFileManager\Services\FileManager;
+use UniFileManager\Core\Services\FileManager;
 
 beforeEach(function (): void {
     Storage::fake('testing');

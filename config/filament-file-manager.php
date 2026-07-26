@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use UniFileManager\FilamentFileManager\Support\DefaultFileManagerAuthorizer;
-use UniFileManager\FilamentFileManager\Support\ConfigStorageAreaResolver;
+use UniFileManager\Core\Support\DefaultFileManagerAuthorizer;
+use UniFileManager\Core\Support\ConfigStorageAreaResolver;
 
 return [
     /* @deprecated Use storage_areas.private.disk. */

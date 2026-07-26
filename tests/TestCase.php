@@ -7,7 +7,7 @@ namespace UniFileManager\FilamentFileManager\Tests;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Livewire\LivewireServiceProvider;
-use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
+use UniFileManager\Core\Contracts\FileManagerAuthorizer;
 use UniFileManager\FilamentFileManager\FilamentFileManagerServiceProvider;
 
 abstract class TestCase extends Orchestra

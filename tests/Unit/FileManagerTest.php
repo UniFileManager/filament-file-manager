@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use UniFileManager\FilamentFileManager\Exceptions\FolderNotEmpty;
-use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
-use UniFileManager\FilamentFileManager\Exceptions\UnsafeDiskConfiguration;
-use UniFileManager\FilamentFileManager\Services\FileManager;
+use UniFileManager\Core\Exceptions\FolderNotEmpty;
+use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\Core\Exceptions\UnsafeDiskConfiguration;
+use UniFileManager\Core\Services\FileManager;
 
 beforeEach(function (): void {
     Storage::fake('testing');
