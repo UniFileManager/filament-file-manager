@@ -4,7 +4,12 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 0.7.0 - 2026-07-26
+
+### Changed
+
+- Moved shared file-management services, support classes, contracts, and exceptions to `unifilemanager/core`.
+- Updated the Filament package to use the shared core package while keeping compatibility aliases for older published configuration values.
 
 ## 0.6.2 - 2026-07-26
 

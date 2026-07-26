@@ -70,8 +70,15 @@ this table.
 Install the package and publish its configuration:
 
 ```bash
-composer require unifilemanager/filament-file-manager:"^0.6"
+composer require unifilemanager/filament-file-manager:"^0.7"
 php artisan vendor:publish --tag=filament-file-manager-config
+```
+
+When updating from an older version, allow Composer to update related package
+dependencies as well:
+
+```bash
+composer update unifilemanager/filament-file-manager --with-all-dependencies
 ```
 
 Register the plugin in your Filament panel provider:
