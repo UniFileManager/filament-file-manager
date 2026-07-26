@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
-use UniFileManager\FilamentFileManager\Support\DirectoryScope;
+use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\Core\Support\DirectoryScope;
 
 it('normalises a File Picker directory below the configured root', function (): void {
     expect(DirectoryScope::normalise('/avatars/profile-images/'))->toBe('avatars/profile-images');

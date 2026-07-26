@@ -17,10 +17,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use UniFileManager\FilamentFileManager\Services\FileManager as FileManagerService;
-use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
-use UniFileManager\FilamentFileManager\Exceptions\FolderNotEmpty;
-use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
+use UniFileManager\Core\Services\FileManager as FileManagerService;
+use UniFileManager\Core\Contracts\StorageAreaResolver;
+use UniFileManager\Core\Exceptions\FolderNotEmpty;
+use UniFileManager\Core\Exceptions\InvalidFilePath;
 use Throwable;
 
 final class FileManager extends Page

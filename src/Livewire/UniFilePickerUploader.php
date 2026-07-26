@@ -9,10 +9,10 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use UniFileManager\FilamentFileManager\Exceptions\InvalidFilePath;
-use UniFileManager\FilamentFileManager\Services\FileManager as FileManagerService;
-use UniFileManager\FilamentFileManager\Support\DirectoryScope;
-use UniFileManager\FilamentFileManager\Support\MimeTypeMatcher;
+use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\Core\Services\FileManager as FileManagerService;
+use UniFileManager\Core\Support\DirectoryScope;
+use UniFileManager\Core\Support\MimeTypeMatcher;
 use Throwable;
 
 final class UniFilePickerUploader extends Component

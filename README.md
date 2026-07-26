@@ -113,7 +113,7 @@ model does not have an `is_admin` attribute, use an existing role or permission
 check instead. Users granted the ability can open the **File Manager** page from
 your Filament navigation.
 
-For tenant-specific access, implement both `FileManagerAuthorizer` and a
+For tenant-specific access, implement the core `FileManagerAuthorizer` and a
 request-aware `StorageAreaResolver`. See the [multi-tenancy guide](docs/multi-tenancy.md)
 for a working pattern.
 
@@ -339,8 +339,8 @@ when opening File Manager.
 - The default area uses Laravel's private `local` disk. It refuses the standard
   `public` disk and local roots below `public/` or `storage/app/public` when an
   area is configured as private.
-- Replace the default `manageFileManager` check with an application-specific
-  `FileManagerAuthorizer` and `StorageAreaResolver` when access depends on
+- Replace the default `manageFileManager` check with application-specific core
+  `FileManagerAuthorizer` and `StorageAreaResolver` classes when access depends on
   tenants or paths. Read the [multi-tenancy guide](docs/multi-tenancy.md)
   before enabling the package in a tenant application.
 - Keep the package MIME and extension lists narrow for your use case. The

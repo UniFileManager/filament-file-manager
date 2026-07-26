@@ -16,7 +16,7 @@ without exposing another tenant's files.
 ```php
 namespace App\Support;
 
-use UniFileManager\FilamentFileManager\Contracts\StorageAreaResolver;
+use UniFileManager\Core\Contracts\StorageAreaResolver;
 
 final class TenantStorageAreaResolver implements StorageAreaResolver
 {
@@ -77,7 +77,7 @@ Replace the default authorizer with one that verifies tenant membership as well 
 ```php
 namespace App\Support;
 
-use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
+use UniFileManager\Core\Contracts\FileManagerAuthorizer;
 
 final class TenantFileManagerAuthorizer implements FileManagerAuthorizer
 {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace UniFileManager\FilamentFileManager\Contracts;
 
-interface FileManagerAuthorizer
+use UniFileManager\Core\Contracts\FileManagerAuthorizer as CoreFileManagerAuthorizer;
+
+/**
+ * @deprecated Implement UniFileManager\Core\Contracts\FileManagerAuthorizer instead.
+ */
+interface FileManagerAuthorizer extends CoreFileManagerAuthorizer
 {
-    public function can(mixed $user, string $operation, string $path = ''): bool;
 }

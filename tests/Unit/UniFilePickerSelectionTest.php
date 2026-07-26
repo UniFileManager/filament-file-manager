@@ -6,9 +6,9 @@ use Illuminate\Auth\GenericUser;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use UniFileManager\FilamentFileManager\Contracts\FileManagerAuthorizer;
+use UniFileManager\Core\Contracts\FileManagerAuthorizer;
 use UniFileManager\FilamentFileManager\Filament\Forms\Components\UniFilePicker;
-use UniFileManager\FilamentFileManager\Services\FileManager;
+use UniFileManager\Core\Services\FileManager;
 
 function pickerInSchema(UniFilePicker $picker): UniFilePicker
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use UniFileManager\FilamentFileManager\Support\MimeTypeMatcher;
+use UniFileManager\Core\Support\MimeTypeMatcher;
 
 it('matches exact and wildcard MIME types', function (): void {
     expect(MimeTypeMatcher::allows('image/png', ['image/*']))->toBeTrue()
