@@ -334,7 +334,7 @@
                             @endif
                             <button
                                 type="button"
-                                @if ($file['type'] === 'directory') wire:click="open({{ \Illuminate\Support\Js::from($file['path']) }})" @elseif ($this->isImage($file)) x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path'])]) }}" @else wire:click="select({{ \Illuminate\Support\Js::from($file['path']) }})" @endif
+                                @if ($file['type'] === 'directory') wire:click="open({{ \Illuminate\Support\Js::from($file['path']) }})" @elseif ($this->isImage($file)) x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'width' => null, 'height' => null]) }}" @else wire:click="select({{ \Illuminate\Support\Js::from($file['path']) }})" @endif
                                 class="ufm__file-select"
                             >
                                 <span class="ufm__file-preview {{ $file['type'] === 'directory' ? 'ufm__file-preview--folder' : '' }}">
@@ -363,7 +363,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
                                     @if ($this->isImage($file))
-                                        <button type="button" class="ufm__file-action" x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path'])]) }}" aria-label="Preview image" title="Preview image">
+                                        <button type="button" class="ufm__file-action" x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'width' => null, 'height' => null]) }}" aria-label="Preview image" title="Preview image">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
                                         </button>
                                     @endif
@@ -412,9 +412,9 @@
                 <button type="button" class="ufm__move-backdrop" wire:click="cancelMove" aria-label="Close move dialog"></button>
                 <section class="ufm__move-dialog">
                     <header class="ufm__move-header">
-                        <div>
-                            <h2 id="ufm-move-title">Move “{{ basename($movingPath) }}”</h2>
-                            <p>Choose a folder, then confirm the destination.</p>
+                        <div class="ufm__move-title-group">
+                            <span class="ufm__move-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                            <div><span>Moving item</span><h2 id="ufm-move-title">{{ basename($movingPath) }}</h2><p>Browse to the destination folder, then confirm.</p></div>
                         </div>
                         <button type="button" wire:click="cancelMove" class="ufm__move-close" aria-label="Close move dialog">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
@@ -467,9 +467,9 @@
                     </div>
 
                     <footer class="ufm__move-footer">
-                        <div>
-                            <span>Destination</span>
-                            <strong>{{ $moveDestinationPath === '' ? 'Main Library' : str_replace('/', ' / ', $moveDestinationPath) }}</strong>
+                        <div class="ufm__move-destination">
+                            <span class="ufm__move-destination-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z" stroke-linejoin="round"/></svg></span>
+                            <div><span>Destination</span><strong>{{ $moveDestinationPath === '' ? 'Main Library' : str_replace('/', ' / ', $moveDestinationPath) }}</strong></div>
                             @unless ($canMoveToCurrentFolder)
                                 <small>Choose a different destination.</small>
                             @endunless
@@ -489,22 +489,40 @@
         <div x-show="imagePreview" x-cloak x-on:keydown.escape.window="imagePreview = null" class="ufm__preview-modal" role="dialog" aria-modal="true" x-bind:aria-label="imagePreview?.name">
             <div class="ufm__preview-backdrop" x-on:click="imagePreview = null"></div>
             <div class="ufm__preview-dialog ufm__preview-dialog--details">
-                <div class="ufm__preview-header"><p x-text="imagePreview?.name"></p><button type="button" x-on:click="imagePreview = null" aria-label="Close preview">×</button></div>
+                <div class="ufm__preview-header ufm__preview-header--details"><div><span>Image preview</span><p x-text="imagePreview?.name"></p></div><button type="button" x-on:click="imagePreview = null" aria-label="Close preview">×</button></div>
                 <div class="ufm__preview-body">
-                    <div class="ufm__preview-image"><img x-bind:src="imagePreview?.url" x-bind:alt="imagePreview?.name" /></div>
+                    <div class="ufm__preview-image"><img x-bind:src="imagePreview?.url" x-bind:alt="imagePreview?.name" x-on:load="imagePreview.width = $event.target.naturalWidth; imagePreview.height = $event.target.naturalHeight" /></div>
                     <aside class="ufm__preview-details">
-                        <h3>File details</h3>
-                        <dl><dt>Type</dt><dd x-text="imagePreview?.mime || 'Image'"></dd><dt>Size</dt><dd x-text="imagePreview?.size ? (imagePreview.size / 1024).toFixed(1) + ' KB' : '—'"></dd><dt>Modified</dt><dd x-text="imagePreview?.modified ? new Date(imagePreview.modified * 1000).toLocaleDateString() : '—'"></dd></dl>
-                        <p>Relative path</p><div class="ufm__preview-copy"><code x-text="imagePreview?.path"></code><button type="button" x-on:click="copyText(imagePreview?.path)">Copy</button></div>
-                        <template x-if="imagePreview?.publicUrl"><div><p>Public URL</p><div class="ufm__preview-copy"><code x-text="imagePreview?.publicUrl"></code><button type="button" x-on:click="copyText(imagePreview?.publicUrl)">Copy</button></div></div></template>
-                        <button type="button" class="ufm__preview-download" x-on:click="$wire.download(imagePreview.path)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18.5h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Download file
-                        </button>
-                        <button type="button" class="ufm__preview-rename" x-on:click="$wire.beginRename(imagePreview.path); imagePreview = null">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Rename file
-                        </button>
+                        <div class="ufm__preview-details-content">
+                            <div class="ufm__preview-details-heading"><span class="ufm__preview-details-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 10v5m0-8v.01" stroke-linecap="round"/></svg></span><h3>File details</h3></div>
+                            <dl><dt>Type</dt><dd x-text="imagePreview?.mime || 'Image'"></dd><dt>Size</dt><dd x-text="imagePreview?.size ? (imagePreview.size / 1024).toFixed(1) + ' KB' : '—'"></dd><dt>Resolution</dt><dd x-text="imagePreview?.width && imagePreview?.height ? imagePreview.width + ' x ' + imagePreview.height + ' px' : 'Loading...'"></dd><dt>Modified</dt><dd x-text="imagePreview?.modified ? new Date(imagePreview.modified * 1000).toLocaleDateString() : '—'"></dd></dl>
+                            <div class="ufm__preview-copy-field">
+                                <p>Relative path</p>
+                                <div class="ufm__preview-copy">
+                                    <code x-text="imagePreview?.path"></code>
+                                    <button type="button" x-on:click="copyText(imagePreview?.path)">Copy</button>
+                                </div>
+                            </div>
+                            <template x-if="imagePreview?.publicUrl">
+                                <div class="ufm__preview-copy-field">
+                                    <p>Public URL</p>
+                                    <div class="ufm__preview-copy">
+                                        <code x-text="imagePreview?.publicUrl"></code>
+                                        <button type="button" x-on:click="copyText(imagePreview?.publicUrl)">Copy</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="ufm__preview-actions">
+                            <button type="button" class="ufm__preview-download" x-on:click="$wire.download(imagePreview.path)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18.5h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Download
+                            </button>
+                            <button type="button" class="ufm__preview-rename" x-on:click="$wire.beginRename(imagePreview.path); imagePreview = null">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Rename
+                            </button>
+                        </div>
                     </aside>
                 </div>
             </div>
