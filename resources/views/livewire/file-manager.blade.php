@@ -1,6 +1,6 @@
 <x-filament-panels::page
     class="ufm"
-    x-data="{ optionsOpen: false, storageOpen: false, imagePreview: null, uploadModal: false, recentlyUploaded: [], uploadHighlightTimer: null, uploadDragging: false, uploading: false, uploadProgress: 0, maxUploadFiles: {{ $this->maximumUploadFiles() }}, copyText(value) { if (! value) return; if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(value); return; } const textarea = document.createElement('textarea'); textarea.value = value; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove(); } }"
+    x-data="{ optionsOpen: false, storageOpen: false, filePreview: null, uploadModal: false, recentlyUploaded: [], uploadHighlightTimer: null, uploadDragging: false, uploading: false, uploadProgress: 0, maxUploadFiles: {{ $this->maximumUploadFiles() }}, copyText(value) { if (! value) return; if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(value); return; } const textarea = document.createElement('textarea'); textarea.value = value; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove(); } }"
     x-on:unifile-manager:selected.window="localStorage.setItem('unifile-manager:selected', JSON.stringify({ path: $event.detail.path, nonce: Date.now() }))"
     x-on:file-manager:focus-rename.window="$nextTick(() => { $refs.renameItem?.focus(); $refs.renameItem?.select(); })"
     x-on:file-manager:uploaded.window="recentlyUploaded = $event.detail.paths ?? []; clearTimeout(uploadHighlightTimer); uploadHighlightTimer = setTimeout(() => recentlyUploaded = [], 4000)"
@@ -334,7 +334,7 @@
                             @endif
                             <button
                                 type="button"
-                                @if ($file['type'] === 'directory') wire:click="open({{ \Illuminate\Support\Js::from($file['path']) }})" @elseif ($this->isImage($file)) x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'width' => null, 'height' => null]) }}" @else wire:click="select({{ \Illuminate\Support\Js::from($file['path']) }})" @endif
+                                @if ($file['type'] === 'directory') wire:click="open({{ \Illuminate\Support\Js::from($file['path']) }})" @elseif ($this->isPreviewable($file)) x-on:click="filePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'isImage' => $this->isImage($file), 'width' => null, 'height' => null]) }}" @else wire:click="select({{ \Illuminate\Support\Js::from($file['path']) }})" @endif
                                 class="ufm__file-select"
                             >
                                 <span class="ufm__file-preview {{ $file['type'] === 'directory' ? 'ufm__file-preview--folder' : '' }}">
@@ -362,8 +362,8 @@
                                     <button type="button" class="ufm__file-action" wire:click="beginMove({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="Move file" title="Move file">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h11m0 0-3-3m3 3-3 3M20 17H9m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
-                                    @if ($this->isImage($file))
-                                        <button type="button" class="ufm__file-action" x-on:click="imagePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'width' => null, 'height' => null]) }}" aria-label="Preview image" title="Preview image">
+                                    @if ($this->isPreviewable($file))
+                                        <button type="button" class="ufm__file-action" x-on:click="filePreview = {{ \Illuminate\Support\Js::from(['url' => $this->previewUrl($file['path']), 'name' => $file['name'], 'path' => $file['path'], 'mime' => $file['mime_type'] ?? null, 'size' => $file['size'] ?? null, 'modified' => $file['modified_at'] ?? null, 'publicUrl' => $this->publicUrl($file['path']), 'isImage' => $this->isImage($file), 'width' => null, 'height' => null]) }}" aria-label="Preview file" title="Preview file">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
                                         </button>
                                     @endif
@@ -486,39 +486,52 @@
             </div>
         @endif
 
-        <div x-show="imagePreview" x-cloak x-on:keydown.escape.window="imagePreview = null" class="ufm__preview-modal" role="dialog" aria-modal="true" x-bind:aria-label="imagePreview?.name">
-            <div class="ufm__preview-backdrop" x-on:click="imagePreview = null"></div>
+        <div x-show="filePreview" x-cloak x-on:keydown.escape.window="filePreview = null" class="ufm__preview-modal" role="dialog" aria-modal="true" x-bind:aria-label="filePreview?.name">
+            <div class="ufm__preview-backdrop" x-on:click="filePreview = null"></div>
             <div class="ufm__preview-dialog ufm__preview-dialog--details">
-                <div class="ufm__preview-header ufm__preview-header--details"><div><span>Image preview</span><p x-text="imagePreview?.name"></p></div><button type="button" x-on:click="imagePreview = null" aria-label="Close preview">×</button></div>
+                <div class="ufm__preview-header ufm__preview-header--details"><div><span x-text="filePreview?.isImage ? 'Image preview' : 'File preview'"></span><p x-text="filePreview?.name"></p></div><button type="button" x-on:click="filePreview = null" aria-label="Close preview">×</button></div>
                 <div class="ufm__preview-body">
-                    <div class="ufm__preview-image"><img x-bind:src="imagePreview?.url" x-bind:alt="imagePreview?.name" x-on:load="imagePreview.width = $event.target.naturalWidth; imagePreview.height = $event.target.naturalHeight" /></div>
-                    <aside class="ufm__preview-details">
+                    <div class="ufm__preview-image">
+                        <template x-if="filePreview?.isImage"><img x-bind:src="filePreview?.url" x-bind:alt="filePreview?.name" x-on:load="filePreview.width = $event.target.naturalWidth; filePreview.height = $event.target.naturalHeight" /></template>
+                        <template x-if="! filePreview?.isImage"><iframe class="ufm__preview-document" x-bind:src="filePreview?.url" x-bind:title="filePreview?.name"></iframe></template>
+                    </div>
+                    <aside class="ufm__preview-details" style="font-family: var(--font-sans, inherit);">
                         <div class="ufm__preview-details-content">
                             <div class="ufm__preview-details-heading"><span class="ufm__preview-details-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 10v5m0-8v.01" stroke-linecap="round"/></svg></span><h3>File details</h3></div>
-                            <dl><dt>Type</dt><dd x-text="imagePreview?.mime || 'Image'"></dd><dt>Size</dt><dd x-text="imagePreview?.size ? (imagePreview.size / 1024).toFixed(1) + ' KB' : '—'"></dd><dt>Resolution</dt><dd x-text="imagePreview?.width && imagePreview?.height ? imagePreview.width + ' x ' + imagePreview.height + ' px' : 'Loading...'"></dd><dt>Modified</dt><dd x-text="imagePreview?.modified ? new Date(imagePreview.modified * 1000).toLocaleDateString() : '—'"></dd></dl>
+                            <dl x-bind:style="document.documentElement.classList.contains('dark') ? { backgroundColor: 'rgb(255 255 255 / .05)', borderColor: 'rgb(255 255 255 / .12)' } : {}">
+                                <div><dt>Type</dt><dd x-text="filePreview?.mime || 'File'"></dd></div>
+                                <div><dt>Size</dt><dd x-text="filePreview?.size ? (filePreview.size / 1024).toFixed(1) + ' KB' : '—'"></dd></div>
+                                <template x-if="filePreview?.isImage"><div><dt>Resolution</dt><dd x-text="filePreview?.width && filePreview?.height ? filePreview.width + ' x ' + filePreview.height + ' px' : 'Loading...'"></dd></div></template>
+                                <div><dt>Modified</dt><dd x-text="filePreview?.modified ? new Date(filePreview.modified * 1000).toLocaleDateString() : '—'"></dd></div>
+                            </dl>
                             <div class="ufm__preview-copy-field">
                                 <p>Relative path</p>
                                 <div class="ufm__preview-copy">
-                                    <code x-text="imagePreview?.path"></code>
-                                    <button type="button" x-on:click="copyText(imagePreview?.path)">Copy</button>
+                                    <code style="font-family: var(--font-sans, inherit);" x-text="filePreview?.path"></code>
+                                    <button type="button" x-on:click="copyText(filePreview?.path)">Copy</button>
                                 </div>
                             </div>
-                            <template x-if="imagePreview?.publicUrl">
+                            <template x-if="filePreview?.publicUrl">
                                 <div class="ufm__preview-copy-field">
                                     <p>Public URL</p>
                                     <div class="ufm__preview-copy">
-                                        <code x-text="imagePreview?.publicUrl"></code>
-                                        <button type="button" x-on:click="copyText(imagePreview?.publicUrl)">Copy</button>
+                                        <code x-text="filePreview?.publicUrl"></code>
+                                        <button type="button" x-on:click="copyText(filePreview?.publicUrl)">Copy</button>
                                     </div>
                                 </div>
                             </template>
                         </div>
-                        <div class="ufm__preview-actions">
-                            <button type="button" class="ufm__preview-download" x-on:click="$wire.download(imagePreview.path)">
+                        <div class="ufm__preview-actions" x-bind:class="{ 'has-document-actions': ! filePreview?.isImage }">
+                            <button type="button" class="ufm__preview-download" x-bind:style="{ gridColumn: filePreview?.isImage ? 'auto' : '1 / -1' }" x-on:click="$wire.download(filePreview.path)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18.5h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 Download
                             </button>
-                            <button type="button" class="ufm__preview-rename" x-on:click="$wire.beginRename(imagePreview.path); imagePreview = null">
+                            <template x-if="! filePreview?.isImage">
+                                <a class="ufm__preview-open ufm__preview-rename" x-bind:href="filePreview?.url" target="_blank" rel="noopener noreferrer">
+                                    Open in new tab
+                                </a>
+                            </template>
+                            <button type="button" class="ufm__preview-rename" x-on:click="$wire.beginRename(filePreview.path); filePreview = null">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M13.5 6.5 17.5 10.5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5 4 20Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 Rename
                             </button>

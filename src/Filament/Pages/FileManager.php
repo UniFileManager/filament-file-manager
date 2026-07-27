@@ -839,6 +839,12 @@ final class FileManager extends Page
         return str_starts_with((string) ($file['mime_type'] ?? ''), 'image/');
     }
 
+    /** @param array{mime_type?: string} $file */
+    public function isPreviewable(array $file): bool
+    {
+        return in_array((string) ($file['mime_type'] ?? ''), config('filament-file-manager.preview_mimes', []), true);
+    }
+
     /** @param array{name: string} $file */
     public function documentKind(array $file): string
     {

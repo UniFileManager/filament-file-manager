@@ -4,6 +4,15 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## 0.7.1 - 2026-07-27
+
+### Fixed
+
+- Restored PDF previews in the File Manager modal.
+- Improved PDF preview sizing and added an “Open in new tab” action.
+- Improved preview metadata alignment, typography, and dark-mode styling.
+- Hide dot-prefixed files and directories through the updated shared core package.
+
 ## 0.7.0 - 2026-07-26
 
 ### Changed
