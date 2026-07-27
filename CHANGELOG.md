@@ -4,6 +4,12 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## 0.7.2 - 2026-07-27
+
+### Fixed
+
+- Require `unifilemanager/core` v0.1.1 or later so dot-prefixed files and folders are consistently hidden from file listings.
+
 ## 0.7.1 - 2026-07-27
 
 ### Fixed
