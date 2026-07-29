@@ -4,6 +4,12 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## 0.7.4 - 2026-07-29
+
+### Fixed
+
+- Keep PDF and image preview modal action labels at the intended 12px size.
+
 ## 0.7.2 - 2026-07-27
 
 ### Fixed
