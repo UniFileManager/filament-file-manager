@@ -64,6 +64,9 @@ final class FileManager extends Page
 
     public bool $isCreatingDirectory = false;
 
+    #[Locked]
+    public ?string $creatingDirectoryStorageArea = null;
+
     /** @var list<string> */
     public array $selectedPaths = [];
 
@@ -148,6 +151,7 @@ final class FileManager extends Page
             $this->renamingPath = $fileManager->createNewDirectory(auth()->user(), $this->path);
             $this->renamingName = basename($this->renamingPath);
             $this->isCreatingDirectory = true;
+            $this->creatingDirectoryStorageArea = $this->storageArea;
             $this->refreshItems();
             $this->showNewFolderPage($this->renamingPath);
             $this->dispatch('file-manager:focus-rename');
@@ -187,7 +191,7 @@ final class FileManager extends Page
                 $this->selectedPaths,
                 static fn (string $selectedPath): bool => $selectedPath !== $renamedPath,
             ));
-            $this->cancelRename();
+            $this->resetRenamingState();
             $this->refreshItems();
 
             Notification::make()
@@ -234,9 +238,38 @@ final class FileManager extends Page
 
     public function cancelRename(): void
     {
+        $renamingPath = $this->renamingPath;
+        $isCreatingDirectory = $this->isCreatingDirectory;
+        $storageArea = $this->creatingDirectoryStorageArea ?? $this->storageArea;
+
+        $this->resetRenamingState();
+
+        if (! $isCreatingDirectory || $renamingPath === null) {
+            return;
+        }
+
+        try {
+            app(FileManagerService::class)
+                ->forArea($storageArea)
+                ->delete(auth()->user(), $renamingPath);
+            $this->refreshItems();
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->danger()
+                ->title('Folder cancellation failed')
+                ->body('The new folder could not be removed. Please try again.')
+                ->send();
+        }
+    }
+
+    private function resetRenamingState(): void
+    {
         $this->renamingPath = null;
         $this->renamingName = '';
         $this->isCreatingDirectory = false;
+        $this->creatingDirectoryStorageArea = null;
         $this->resetValidation('renamingName');
     }
 

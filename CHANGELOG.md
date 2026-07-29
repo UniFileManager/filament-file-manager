@@ -4,6 +4,12 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## 0.7.5 - 2026-07-29
+
+### Fixed
+
+- Remove a newly created folder when its name is cancelled.
+
 ## 0.7.4 - 2026-07-29
 
 ### Fixed
