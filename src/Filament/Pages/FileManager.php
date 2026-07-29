@@ -111,11 +111,11 @@ final class FileManager extends Page
         $available = [];
         foreach (is_array($areas) ? $areas : [] as $key => $area) {
             if (is_string($key) && is_array($area) && ($area['enabled'] ?? false)) {
-                $available[$key] = $key === 'public' ? 'Public media' : 'Private files';
+                $available[$key] = $key === 'public' ? __('filament-file-manager::file-manager.public_media') : __('filament-file-manager::file-manager.private_files');
             }
         }
 
-        return $available === [] ? ['private' => 'Private files'] : $available;
+        return $available === [] ? ['private' => __('filament-file-manager::file-manager.private_files')] : $available;
     }
 
     public function getMaxContentWidth(): Width
@@ -154,7 +154,7 @@ final class FileManager extends Page
         } catch (InvalidFilePath $exception) {
             Notification::make()
                 ->danger()
-                ->title('Folder cannot be created')
+                ->title(__('filament-file-manager::file-manager.folder_cannot_be_created'))
                 ->body($exception->getMessage())
                 ->send();
         }
@@ -193,13 +193,13 @@ final class FileManager extends Page
             Notification::make()
                 ->success()
                 ->title($isCreatingDirectory
-                    ? 'Folder created'
-                    : ($originalName === $updatedName ? $itemType.' name saved' : $itemType.' renamed'))
+                    ? __('filament-file-manager::file-manager.folder_created')
+                    : ($originalName === $updatedName ? $itemType .' '. __('filament-file-manager::file-manager.name_saved') : $itemType.' '. __('filament-file-manager::file-manager.renamed')))
                 ->body($isCreatingDirectory
-                    ? sprintf('"%s" was created.', $updatedName)
+                    ? sprintf(__('filament-file-manager::file-manager.object_was_created'), $updatedName)
                     : ($originalName === $updatedName
-                        ? sprintf('The %s name is unchanged.', strtolower($itemType))
-                        : sprintf('"%s" is now "%s".', $originalName, $updatedName)))
+                        ? sprintf(__('filament-file-manager::file-manager.name_is_unchanged'), strtolower($itemType))
+                        : sprintf(__('filament-file-manager::file-manager.a_is_now_b'), $originalName, $updatedName)))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
@@ -207,8 +207,8 @@ final class FileManager extends Page
 
             Notification::make()
                 ->danger()
-                ->title('Rename failed')
-                ->body('The item could not be renamed. Please try again.')
+                ->title(__('filament-file-manager::file-manager.rename_failed'))
+                ->body(__('filament-file-manager::file-manager.rename_failed_body'))
                 ->send();
         }
     }
@@ -301,11 +301,11 @@ final class FileManager extends Page
 
         if ($count > $maximum) {
             $this->reset('uploads');
-            $this->addError('uploads', sprintf('You may upload a maximum of %d files at once.', $maximum));
+            $this->addError('uploads', sprintf(__('filament-file-manager::file-manager.upload_maximum_files'), $maximum));
             Notification::make()
                 ->danger()
-                ->title('Too many files selected')
-                ->body(sprintf('Select a maximum of %d files at once.', $maximum))
+                ->title(__('filament-file-manager::file-manager.too_many_files_selected'))
+                ->body(sprintf(__('filament-file-manager::file-manager.select_maximum_files_at_once'), $maximum))
                 ->send();
 
             return;
@@ -328,12 +328,12 @@ final class FileManager extends Page
     {
         $maximum = $this->maximumUploadFiles();
         $this->reset('uploads');
-        $this->addError('uploads', sprintf('You selected %d files. The maximum is %d files.', $count, $maximum));
+        $this->addError('uploads', sprintf(__('filament-file-manager::file-manager.uploaded_too_many_files'), $count, $maximum));
 
         Notification::make()
             ->danger()
-            ->title('Too many files selected')
-            ->body(sprintf('Select a maximum of %d files at once.', $maximum))
+	        ->title(__('filament-file-manager::file-manager.too_many_files_selected'))
+	        ->body(sprintf(__('filament-file-manager::file-manager.select_maximum_files_at_once'), $maximum))
             ->send();
     }
 
@@ -377,14 +377,14 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-                ->title(count($uploadedPaths) === 1 ? 'File uploaded' : 'Files uploaded')
-                ->body(count($uploadedPaths) === 1 ? basename($uploadedPaths[0]) : sprintf('%d files were uploaded successfully.', count($uploadedPaths)))
+                ->title(count($uploadedPaths) === 1 ? __('filament-file-manager::file-manager.file_uploaded') : __('filament-file-manager::file-manager.files_uploaded'))
+                ->body(count($uploadedPaths) === 1 ? basename($uploadedPaths[0]) : sprintf(__('filament-file-manager::file-manager.files_were_uploaded_succesfully'), count($uploadedPaths)))
                 ->send();
         } catch (ValidationException $exception) {
             Notification::make()
                 ->danger()
-                ->title('Upload validation failed')
-                ->body('Review the selected files and try again.')
+                ->title(__('filament-file-manager::file-manager.upload_validation_failed'))
+                ->body(__('filament-file-manager::file-manager.review_selected_files'))
                 ->send();
 
             throw $exception;
@@ -398,8 +398,8 @@ final class FileManager extends Page
 
             Notification::make()
                 ->danger()
-                ->title('Upload failed')
-                ->body('The files could not be uploaded. Please try again.')
+                ->title('filament-file-manager::file-manager.upload_failed')
+                ->body('filament-file-manager::file-manager.upload_failed_body')
                 ->send();
         }
     }
@@ -427,16 +427,16 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-                ->title($type === 'directory' ? 'Folder deleted' : 'File deleted')
-                ->body('The '.$label.' was removed successfully.')
+                ->title($type === 'directory' ? __('filament-file-manager::file-manager.folder_deleted') : __('filament-file-manager::file-manager.file_deleted'))
+                ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted', $label)))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
 
             Notification::make()
                 ->danger()
-                ->title('Delete failed')
-                ->body($exception instanceof FolderNotEmpty ? $exception->getMessage() : 'The '.$label.' could not be deleted. Please try again.')
+                ->title(__('filament-file-manager::file-manager.delete_failed'))
+                ->body($exception instanceof FolderNotEmpty ? $exception->getMessage() : sprintf(__('filament-file-manager::file-manager.delete_failed_body'), $label))
                 ->send();
         }
     }
@@ -445,9 +445,9 @@ final class FileManager extends Page
     {
         return Action::make('deleteItem')
             ->requiresConfirmation()
-            ->modalHeading('Delete item?')
-            ->modalDescription('This permanently deletes the selected file or folder from storage.')
-            ->modalSubmitActionLabel('Delete item')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_item') .'?')
+            ->modalDescription(__('filament-file-manager::file-manager.delete_item_body'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_item'))
             ->color('danger')
             ->action(function (array $arguments): void {
                 $path = $arguments['path'] ?? null;
@@ -474,8 +474,8 @@ final class FileManager extends Page
 
             Notification::make()
                 ->danger()
-                ->title('Move unavailable')
-                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : 'This item cannot be moved right now.')
+                ->title(__('filament-file-manager::file-manager.move_unavailable'))
+                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.move_unavailable_body'))
                 ->send();
         }
     }
@@ -594,16 +594,16 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-                ->title($type === 'directory' ? 'Folder moved' : 'File moved')
-                ->body(sprintf('"%s" moved to %s.', $itemName, dirname($target) === '.' ? 'Main Library' : '"'.dirname($target).'"'))
+	            ->title($type === 'directory' ? __('filament-file-manager::file-manager.folder_moved') : __('filament-file-manager::file-manager.file_moved'))
+                ->body(sprintf(__('filament-file-manager::file-manager.a_moved_to_b'), $itemName, dirname($target) === '.' ? __('filament-file-manager::file-manager.main_library') : '"'.dirname($target).'"'))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
 
             Notification::make()
                 ->danger()
-                ->title('Move failed')
-                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : 'The item could not be moved. Please try again.')
+                ->title(__('filament-file-manager::file-manager.move_failed'))
+                ->body($exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.move_failed_body'))
                 ->send();
         }
     }
@@ -635,9 +635,9 @@ final class FileManager extends Page
     {
         return Action::make('deleteSelectedItems')
             ->requiresConfirmation()
-            ->modalHeading('Delete selected items?')
-            ->modalDescription(fn (): string => sprintf('This permanently deletes the %d selected item%s. This action cannot be undone.', count($this->selectedPaths), count($this->selectedPaths) === 1 ? '' : 's'))
-            ->modalSubmitActionLabel('Delete selected items')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_selected_items') . '?')
+            ->modalDescription(fn (): string => sprintf(__('filament-file-manager::file-manager.delete_selected_items_body'), count($this->selectedPaths), count($this->selectedPaths) === 1 ? '' : 's'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_selected_items'))
             ->color('danger')
             ->action(function (): void {
                 $this->deleteSelectedItems(app(FileManagerService::class));
@@ -678,24 +678,24 @@ final class FileManager extends Page
         $this->refreshItems();
 
         $nonEmptyFolderMessage = sprintf(
-            '%d folder%s %s not deleted because %s still contain%s files or folders. Move or delete %s contents, then try again.',
+            __('filament-file-manager::file-manager.non_empty_folder_message'),
             $nonEmptyFolders,
-            $nonEmptyFolders === 1 ? '' : 's',
-            $nonEmptyFolders === 1 ? 'was' : 'were',
-            $nonEmptyFolders === 1 ? 'it' : 'they',
-            $nonEmptyFolders === 1 ? 's' : '',
-            $nonEmptyFolders === 1 ? 'its' : 'their',
+            $nonEmptyFolders === 1 ? __('filament-file-manager::file-manager.folder') : __('filament-file-manager::file-manager.folders'),
+            $nonEmptyFolders === 1 ? __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.were'),
+            $nonEmptyFolders === 1 ? __('filament-file-manager::file-manager.it') : __('filament-file-manager::file-manager.they'),
+            $nonEmptyFolders === 1 ? __('filament-file-manager::file-manager.contains') : __('filament-file-manager::file-manager.contain'),
+            $nonEmptyFolders === 1 ? __('filament-file-manager::file-manager.its') : __('filament-file-manager::file-manager.their'),
         );
 
         $notification = Notification::make()
-            ->title($failed === 0 ? 'Selected items deleted' : 'Some items were not deleted')
+            ->title($failed === 0 ? __('filament-file-manager::file-manager.selected_items_deleted') : __('filament-file-manager::file-manager.some_items_were_not_deleted'))
             ->body($failed === 0
-                ? sprintf('%d item%s deleted successfully.', count($deletedPaths), count($deletedPaths) === 1 ? ' was' : 's were')
+                ? sprintf(__('filament-file-manager::file-manager.items_deleted_succesfully'), count($deletedPaths), count($deletedPaths) === 1 ? __('filament-file-manager::file-manager.item') .' '. __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.items') .' '. __('filament-file-manager::file-manager.were'))
                 : ($nonEmptyFolders > 0
                     ? (count($deletedPaths) > 0
-                        ? sprintf('%d item%s deleted. %s', count($deletedPaths), count($deletedPaths) === 1 ? ' was' : 's were', $nonEmptyFolderMessage)
+                        ? sprintf(__('filament-file-manager::file-manager.non_empty_folder_title'), count($deletedPaths), count($deletedPaths) === 1 ?  __('filament-file-manager::file-manager.item') .' '. __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.items') .' '. __('filament-file-manager::file-manager.were'), $nonEmptyFolderMessage)
                         : $nonEmptyFolderMessage)
-                    : sprintf('%d item%s could not be deleted and remain selected.', $failed, $failed === 1 ? '' : 's')));
+                    : sprintf(__('filament-file-manager::file-manager.items_could_not_be_deleted'), $failed, $failed === 1 ?  __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items'))));
 
         if ($failed === 0) {
             $notification->success();
@@ -723,16 +723,16 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-                ->title('File deleted')
-                ->body('The uploaded file was removed successfully.')
+	            ->title(__('filament-file-manager::file-manager.file_deleted'))
+	            ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted'), __('filament-file-manager::file-manager.file')))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
 
             Notification::make()
                 ->danger()
-                ->title('Delete failed')
-                ->body('The uploaded file could not be deleted. Please try again.')
+                ->title(__('filament-file-manager::file-manager.delete_failed'))
+                ->body(__('filament-file-manager::file-manager.delete_failed_body'))
                 ->send();
         }
     }
@@ -741,9 +741,9 @@ final class FileManager extends Page
     {
         return Action::make('deleteUploadedPreview')
             ->requiresConfirmation()
-            ->modalHeading('Delete uploaded file?')
-            ->modalDescription('This permanently deletes the file from storage.')
-            ->modalSubmitActionLabel('Delete file')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_uploaded_file') .'?')
+            ->modalDescription(__('filament-file-manager::file-manager.delete_uploaded_file_description'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_file'))
             ->color('danger')
             ->action(function (array $arguments): void {
                 $path = $arguments['path'] ?? null;
@@ -758,9 +758,9 @@ final class FileManager extends Page
     {
         return Action::make('deleteAllUploadedPreviews')
             ->requiresConfirmation()
-            ->modalHeading('Delete all these uploads?')
-            ->modalDescription('This permanently deletes every file currently listed in this upload window.')
-            ->modalSubmitActionLabel('Delete all files')
+            ->modalHeading(__('filament-file-manager::file-manager.delete_all_uploads_heading'))
+            ->modalDescription(__('filament-file-manager::file-manager.delete_all_uploads_description'))
+            ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_all'))
             ->color('danger')
             ->action(function (): void {
                 $this->deleteAllUploadedPreviews(app(FileManagerService::class));
@@ -794,8 +794,8 @@ final class FileManager extends Page
         if ($failed === 0) {
             Notification::make()
                 ->success()
-                ->title('Recent uploads deleted')
-                ->body(sprintf('%d %s deleted successfully.', count($deletedPaths), count($deletedPaths) === 1 ? 'file was' : 'files were'))
+                ->title(__('filament-file-manager::file-manager.recent_uploads_deleted'))
+                ->body(sprintf(__('filament-file-manager::file-manager.deleted_succesfully_body'), count($deletedPaths), count($deletedPaths) === 1 ? __('filament-file-manager::file-manager.file') .' ' . __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.files') .' ' . __('filament-file-manager::file-manager.were')))
                 ->send();
 
             return;
@@ -803,8 +803,8 @@ final class FileManager extends Page
 
         Notification::make()
             ->warning()
-            ->title('Some files could not be deleted')
-            ->body(sprintf('%d file%s remain in the upload list.', $failed, $failed === 1 ? '' : 's'))
+            ->title(__('filament-file-manager::file-manager.some_uploads_not_deleted'))
+            ->body(sprintf(__('filament-file-manager::file-manager.some_uploads_not_deleted_details'), $failed, $failed === 1 ? __('filament-file-manager::file-manager.file') : __('filament-file-manager::file-manager.files')))
             ->send();
     }
 
