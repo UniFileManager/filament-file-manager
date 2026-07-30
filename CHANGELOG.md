@@ -4,6 +4,20 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## v0.7.6 - 2026-07-30
+
+### Added
+- Added Dutch translations.
+- Made the File Manager page title and navigation label translatable.
+
+### Fixed
+- Fixed missing move modal search translation.
+- Removed duplicate translation keys.
+- Fixed translated labels in preview, upload, and move UI.
+- Removed debug code from the delete failure path.
+
+Thanks to @kevin-fryskict for contributing the Dutch translation work.
+
 ## 0.7.5 - 2026-07-29
 
 ### Fixed
