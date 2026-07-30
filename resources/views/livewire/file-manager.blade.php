@@ -104,7 +104,7 @@
                     <input x-ref="uploadInput" type="file" wire:model="uploads" multiple x-on:livewire-upload-start="uploading = true; uploadProgress = 0" x-on:livewire-upload-progress="uploadProgress = $event.detail.progress" x-on:livewire-upload-finish="uploading = false; uploadProgress = 100" x-on:livewire-upload-error="uploading = false" x-on:change.capture="if ($event.target.files.length > maxUploadFiles) { $event.stopImmediatePropagation(); $wire.rejectTooManyFiles($event.target.files.length); $event.target.value = ''; }" class="ufm__visually-hidden" />
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 18.5h10a4 4 0 0 0 .77-7.93A5.8 5.8 0 0 0 6.7 9.2 4.7 4.7 0 0 0 7 18.5Z" stroke-linecap="round"/><path d="m12 15.5 0-7m0 0-2.5 2.5M12 8.5l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span class="ufm__upload-dropzone-title">{{ __('filament-file-manager::file-manager.choose_files_and_drop') }}</span>
-                    <span class="ufm__upload-dropzone-help">{{ sprintf(__('filament-file-manager::file-manager.uploads_start_automatically'), strtoupper(implode(', ', array_slice(config('filament-file-manager.allowed_extensions'), 0, 5))), round(config('filament-file-manager.max_upload_size') / 1024) ) }}</span>
+                    <span class="ufm__upload-dropzone-help">{{ sprintf(__('filament-file-manager::file-manager.upload_dropzone_help'), strtoupper(implode(', ', array_slice(config('filament-file-manager.allowed_extensions'), 0, 5))), round(config('filament-file-manager.max_upload_size') / 1024) ) }}</span>
                     <span class="ufm__upload-browse">{{ __('filament-file-manager::file-manager.browse_files') }}</span>
                 </label>
 
@@ -132,7 +132,7 @@
                                         <span class="ufm__document-icon ufm__document-icon--{{ $documentKind }}"><span>{{ strtoupper($documentKind === 'word' ? 'doc' : $documentKind) }}</span></span>
                                     @endif
                                     <p>{{ $uploadedFile['name'] }}</p>
-                                    <em>Uploaded</em>
+                                    <em>{{ __('filament-file-manager::file-manager.uploaded') }}</em>
                                     <button type="button" wire:click="mountAction('deleteUploadedPreview', { path: {{ \Illuminate\Support\Js::from($uploadedFile['path']) }} })" class="ufm__upload-remove ufm__upload-remove--danger" aria-label="{{ __('filament-file-manager::file-manager.delete') .' '. $uploadedFile['name'] }}" title="{{ __('filament-file-manager::file-manager.delete_file') }}">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M10 11v5m4-5v5M9 7l1-3h4l1 3m-9 0 1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
@@ -157,7 +157,7 @@
                 <span>{{ count($selectedPaths) .' '. __('filament-file-manager::file-manager.selected') }}</span>
                 <button type="button" class="ufm__button ufm__button--danger" wire:click="mountAction('deleteSelectedItems')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M10 11v5m4-5v5M9 7l1-3h4l1 3m-9 0 1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    __('filament-file-manager::file-manager.delete_selected')
+                    {{ __('filament-file-manager::file-manager.delete_selected') }}
                 </button>
                 <button type="button" class="ufm__button ufm__button--ghost" wire:click="clearSelection">{{ __('filament-file-manager::file-manager.clear') }}</button>
             </div>
@@ -215,7 +215,7 @@
                                 @error('renamingName') <span class="ufm__error">{{ $message }}</span> @enderror
                             </label>
                             <div class="ufm__rename-actions">
-                                <button type="submit" class="ufm__rename-action ufm__rename-action--save" aria-label="{{ __('filament-file-manager::file-manager.save_folder_name') }}" title="Save name">
+                                <button type="submit" class="ufm__rename-action ufm__rename-action--save" aria-label="{{ __('filament-file-manager::file-manager.save_folder_name') }}" title="{{ __('filament-file-manager::file-manager.save_name') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
                                 <button type="button" wire:click="cancelRename" class="ufm__rename-action ufm__rename-action--cancel" aria-label="{{ __('filament-file-manager::file-manager.cancel_folder_rename') }}" title="{{ __('filament-file-manager::file-manager.cancel_rename') }}">

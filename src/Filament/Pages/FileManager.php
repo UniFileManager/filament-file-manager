@@ -38,6 +38,11 @@ final class FileManager extends Page
 
     protected static string | BackedEnum | null $navigationIcon = 'ufm-file-manager';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament-file-manager::file-manager.file_manager');
+    }
+
     public string $path = '';
 
     public string $storageArea = 'private';
@@ -114,7 +119,9 @@ final class FileManager extends Page
         $available = [];
         foreach (is_array($areas) ? $areas : [] as $key => $area) {
             if (is_string($key) && is_array($area) && ($area['enabled'] ?? false)) {
-                $available[$key] = $key === 'public' ? __('filament-file-manager::file-manager.public_media') : __('filament-file-manager::file-manager.private_files');
+                $available[$key] = $key === 'public'
+                    ? __('filament-file-manager::file-manager.public_media')
+                    : __('filament-file-manager::file-manager.private_files');
             }
         }
 
@@ -124,6 +131,11 @@ final class FileManager extends Page
     public function getMaxContentWidth(): Width
     {
         return Width::Full;
+    }
+
+    public function getTitle(): string
+    {
+        return __('filament-file-manager::file-manager.file_manager');
     }
 
     public function open(string $path): void
@@ -198,7 +210,7 @@ final class FileManager extends Page
                 ->success()
                 ->title($isCreatingDirectory
                     ? __('filament-file-manager::file-manager.folder_created')
-                    : ($originalName === $updatedName ? $itemType .' '. __('filament-file-manager::file-manager.name_saved') : $itemType.' '. __('filament-file-manager::file-manager.renamed')))
+                    : ($originalName === $updatedName ? $itemType.' '.__('filament-file-manager::file-manager.name_saved') : $itemType.' '.__('filament-file-manager::file-manager.renamed')))
                 ->body($isCreatingDirectory
                     ? sprintf(__('filament-file-manager::file-manager.object_was_created'), $updatedName)
                     : ($originalName === $updatedName
@@ -465,12 +477,11 @@ final class FileManager extends Page
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
-            dd($exception);
 
             Notification::make()
                 ->danger()
                 ->title(__('filament-file-manager::file-manager.delete_failed'))
-                ->body($exception instanceof FolderNotEmpty ? $exception->getMessage() : sprintf(__('filament-file-manager::file-manager.delete_failed_body'), $label))
+                ->body($exception instanceof FolderNotEmpty ? $exception->getMessage() : sprintf(__('filament-file-manager::file-manager.delete_failed_item_body'), $label))
                 ->send();
         }
     }
@@ -727,9 +738,9 @@ final class FileManager extends Page
                 ? sprintf(__('filament-file-manager::file-manager.items_deleted_succesfully'), count($deletedPaths), count($deletedPaths) === 1 ? __('filament-file-manager::file-manager.item') .' '. __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.items') .' '. __('filament-file-manager::file-manager.were'))
                 : ($nonEmptyFolders > 0
                     ? (count($deletedPaths) > 0
-                        ? sprintf(__('filament-file-manager::file-manager.non_empty_folder_title'), count($deletedPaths), count($deletedPaths) === 1 ?  __('filament-file-manager::file-manager.item') .' '. __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.items') .' '. __('filament-file-manager::file-manager.were'), $nonEmptyFolderMessage)
+                        ? sprintf(__('filament-file-manager::file-manager.non_empty_folder_title'), count($deletedPaths), count($deletedPaths) === 1 ? __('filament-file-manager::file-manager.item') .' '. __('filament-file-manager::file-manager.was') : __('filament-file-manager::file-manager.items') .' '. __('filament-file-manager::file-manager.were'), $nonEmptyFolderMessage)
                         : $nonEmptyFolderMessage)
-                    : sprintf(__('filament-file-manager::file-manager.items_could_not_be_deleted'), $failed, $failed === 1 ?  __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items'))));
+                    : sprintf(__('filament-file-manager::file-manager.items_could_not_be_deleted'), $failed, $failed === 1 ? __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items'))));
 
         if ($failed === 0) {
             $notification->success();
