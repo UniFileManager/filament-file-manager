@@ -90,8 +90,8 @@
             <div class="ufm__preview-backdrop" x-on:click="$wire.closeUploadModal(); uploadModal = false"></div>
                 <div class="ufm__upload-dialog">
                 <div class="ufm__preview-header">
-                    <div><p>{{ __('filament-file-manager::file-manager.filament-file-manager::file-manager.filament-file-m.upload_files') }}</p><span>{{ sprintf(__('filament-file-manager::file-manager.filament-file-manager::file-manager.filament-file-m.choose_files_to_upload'), $this->maximumUploadFiles()) }}</span></div>
-                    <button type="button" x-on:click="$wire.closeUploadModal(); uploadModal = false" aria-label="{{ __('filament-file-manager::file-manager.filament-file-manager::file-manager.filament-file-m.close_upload_dialog') }}">×</button>
+                    <div><p>{{ __('filament-file-manager::file-manager.upload_files') }}</p><span>{{ sprintf(__('filament-file-manager::file-manager.choose_files_to_upload'), $this->maximumUploadFiles()) }}</span></div>
+                    <button type="button" x-on:click="$wire.closeUploadModal(); uploadModal = false" aria-label="{{ __('filament-file-manager::file-manager.close_upload_dialog') }}">×</button>
                 </div>
 
                 <label

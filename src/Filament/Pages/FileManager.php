@@ -332,8 +332,8 @@ final class FileManager extends Page
 
         Notification::make()
             ->danger()
-	        ->title(__('filament-file-manager::file-manager.too_many_files_selected'))
-	        ->body(sprintf(__('filament-file-manager::file-manager.select_maximum_files_at_once'), $maximum))
+            ->title(__('filament-file-manager::file-manager.too_many_files_selected'))
+            ->body(sprintf(__('filament-file-manager::file-manager.select_maximum_files_at_once'), $maximum))
             ->send();
     }
 
@@ -398,8 +398,8 @@ final class FileManager extends Page
 
             Notification::make()
                 ->danger()
-                ->title('filament-file-manager::file-manager.upload_failed')
-                ->body('filament-file-manager::file-manager.upload_failed_body')
+                ->title(__('filament-file-manager::file-manager.upload_failed'))
+                ->body(__('filament-file-manager::file-manager.upload_failed_body'))
                 ->send();
         }
     }
@@ -428,10 +428,11 @@ final class FileManager extends Page
             Notification::make()
                 ->success()
                 ->title($type === 'directory' ? __('filament-file-manager::file-manager.folder_deleted') : __('filament-file-manager::file-manager.file_deleted'))
-                ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted', $label)))
+                ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted'), $label))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
+            dd($exception);
 
             Notification::make()
                 ->danger()
@@ -594,7 +595,7 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-	            ->title($type === 'directory' ? __('filament-file-manager::file-manager.folder_moved') : __('filament-file-manager::file-manager.file_moved'))
+                ->title($type === 'directory' ? __('filament-file-manager::file-manager.folder_moved') : __('filament-file-manager::file-manager.file_moved'))
                 ->body(sprintf(__('filament-file-manager::file-manager.a_moved_to_b'), $itemName, dirname($target) === '.' ? __('filament-file-manager::file-manager.main_library') : '"'.dirname($target).'"'))
                 ->send();
         } catch (Throwable $exception) {
@@ -723,8 +724,8 @@ final class FileManager extends Page
 
             Notification::make()
                 ->success()
-	            ->title(__('filament-file-manager::file-manager.file_deleted'))
-	            ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted'), __('filament-file-manager::file-manager.file')))
+                ->title(__('filament-file-manager::file-manager.file_deleted'))
+                ->body(sprintf(__('filament-file-manager::file-manager.object_was_succesfully_deleted'), __('filament-file-manager::file-manager.file')))
                 ->send();
         } catch (Throwable $exception) {
             report($exception);
