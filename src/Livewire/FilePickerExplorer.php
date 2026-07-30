@@ -482,7 +482,7 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         } catch (Throwable $exception) {
             report($exception);
             $this->reset('uploads');
-            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.upload_failed'));
+            $this->addError('uploads', $exception instanceof InvalidFilePath ? $exception->getMessage() : __('filament-file-manager::file-manager.upload_failed_body'));
         }
     }
 
