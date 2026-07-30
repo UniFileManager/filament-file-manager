@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'file_library' => '', //'Bestandsbibliotheek',
+    'file_library' => 'Bestandsbibliotheek',
     'main_library' => 'Hoofdbibliotheek',
     'storage' => 'Opslag',
     'private_files' => 'Afgeschermde bestanden',

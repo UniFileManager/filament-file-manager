@@ -9,9 +9,7 @@
         <section class="ufm__hero">
             <div class="ufm__hero-main">
                 <div>
-                    @if(!empty(__('filament-file-manager::file-manager.file_library')))
                     <p class="ufm__eyebrow">{{ __('filament-file-manager::file-manager.file_library') }}</p>
-                    @endif
                     <div class="ufm__title-row">
                         <h1 class="ufm__title">{{ $path === '' ? __('filament-file-manager::file-manager.main_library') : basename($path) }}</h1>
                     </div>
