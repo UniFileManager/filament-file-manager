@@ -16,13 +16,18 @@ without exposing another tenant's files.
 ```php
 namespace App\Support;
 
+use Filament\Facades\Filament;
 use UniFileManager\Core\Contracts\StorageAreaResolver;
 
 final class TenantStorageAreaResolver implements StorageAreaResolver
 {
     public function areas(): array
     {
-        $tenantId = tenant()->getKey();
+        $tenantId = Filament::getTenant()?->getKey();
+
+        if ($tenantId === null) {
+            return [];
+        }
 
         return [
             'private' => [
@@ -59,9 +64,11 @@ may instead return a tenant-specific disk name when your tenancy system creates
 one disk per tenant.
 
 ```php
+$tenantId = Filament::getTenant()?->getKey();
+
 'private' => [
     'enabled' => true,
-    'disk' => 'tenant-'.tenant()->getKey(),
+    'disk' => "tenant-{$tenantId}",
     'root' => 'file-manager',
     'visibility' => 'private',
 ],
@@ -70,6 +77,18 @@ one disk per tenant.
 The tenant identifier must come from trusted, server-side tenancy context—not a
 browser-supplied path, query parameter, or form value.
 
+## Tenant-aware previews and thumbnails
+
+When preview and thumbnail URLs are generated inside a Filament tenant panel,
+UniFileManager includes the current Filament panel and tenant route key in the
+preview URL. The preview controller uses those values only to restore Filament's
+tenant context for that request, then verifies that the authenticated user can
+access the tenant before streaming the file.
+
+Do not manually add a tenant id to `directory()`, file paths, or storage-area
+roots from browser input. Tenant isolation should remain in the resolver,
+authorizer, and Filament tenant access checks.
+
 ## Authorizer
 
 Replace the default authorizer with one that verifies tenant membership as well as the File Manager ability:
@@ -77,14 +96,18 @@ Replace the default authorizer with one that verifies tenant membership as well 
 ```php
 namespace App\Support;
 
+use Filament\Facades\Filament;
 use UniFileManager\Core\Contracts\FileManagerAuthorizer;
 
 final class TenantFileManagerAuthorizer implements FileManagerAuthorizer
 {
     public function can(mixed $user, string $operation, string $path = ''): bool
     {
+        $tenantId = Filament::getTenant()?->getKey();
+
         return $user !== null
-            && $user->tenant_id === tenant()->getKey()
+            && $tenantId !== null
+            && $user->tenant_id === $tenantId
             && $user->can('manageFileManager');
     }
 }

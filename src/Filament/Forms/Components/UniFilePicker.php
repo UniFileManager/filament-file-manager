@@ -14,6 +14,7 @@ use UniFileManager\Core\Contracts\StorageAreaResolver;
 use UniFileManager\Core\Support\DirectoryScope;
 use UniFileManager\Core\Support\MimeTypeMatcher;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\FilamentFileManager\Support\PreviewUrlParameters;
 
 class UniFilePicker extends Field
 {
@@ -351,12 +352,12 @@ class UniFilePicker extends Field
 
     public function thumbnailUrl(string $path): string
     {
-        return route('filament-file-manager.preview', ['path' => $path, 'area' => $this->getStorageArea(), 'thumbnail' => 1]);
+        return route('filament-file-manager.preview', PreviewUrlParameters::make($path, $this->getStorageArea(), true));
     }
 
     public function previewUrl(string $path): string
     {
-        return route('filament-file-manager.preview', ['path' => $path, 'area' => $this->getStorageArea()]);
+        return route('filament-file-manager.preview', PreviewUrlParameters::make($path, $this->getStorageArea()));
     }
 
     public function documentKind(string $path): string
