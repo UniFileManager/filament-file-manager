@@ -21,6 +21,7 @@ use UniFileManager\Core\Services\FileManager as FileManagerService;
 use UniFileManager\Core\Contracts\StorageAreaResolver;
 use UniFileManager\Core\Exceptions\FolderNotEmpty;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\FilamentFileManager\Support\PreviewUrlParameters;
 use Throwable;
 
 final class FileManager extends Page
@@ -865,7 +866,7 @@ final class FileManager extends Page
 
     public function previewUrl(string $path): string
     {
-        return route('filament-file-manager.preview', ['path' => $path, 'area' => $this->storageArea]);
+        return route('filament-file-manager.preview', PreviewUrlParameters::make($path, $this->storageArea));
     }
 
     public function publicUrl(string $path): ?string
@@ -875,7 +876,7 @@ final class FileManager extends Page
 
     public function thumbnailUrl(string $path): string
     {
-        return route('filament-file-manager.preview', ['path' => $path, 'area' => $this->storageArea, 'thumbnail' => 1]);
+        return route('filament-file-manager.preview', PreviewUrlParameters::make($path, $this->storageArea, true));
     }
 
     /** @param array{mime_type?: string} $file */
