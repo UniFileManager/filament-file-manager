@@ -95,6 +95,27 @@ public function panel(Panel $panel): Panel
 }
 ```
 
+You may customize the File Manager navigation item from the plugin:
+
+```php
+FilamentFileManagerPlugin::make()
+    ->navigationLabel('Files')
+    ->navigationGroup('Content')
+    ->navigationSort(10)
+    ->navigationIcon('heroicon-o-folder')
+    ->shouldRegisterNavigation(fn (): bool => auth()->user()?->can('manage files') ?? false);
+```
+
+For deeper page customization, register your own page class that extends the
+package File Manager page:
+
+```php
+use App\Filament\Pages\CustomFileManager;
+
+FilamentFileManagerPlugin::make()
+    ->page(CustomFileManager::class);
+```
+
 Publish the package's registered Filament assets after installing or updating:
 
 ```bash
