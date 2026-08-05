@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace UniFileManager\FilamentFileManager\Filament\Pages;
 
 use BackedEnum;
+use Closure;
 use Filament\Actions\Action;
+use Illuminate\Contracts\Support\Htmlable;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
@@ -23,8 +25,9 @@ use UniFileManager\Core\Exceptions\FolderNotEmpty;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
 use UniFileManager\FilamentFileManager\Support\PreviewUrlParameters;
 use Throwable;
+use UnitEnum;
 
-final class FileManager extends Page
+class FileManager extends Page
 {
     use WithFileUploads;
     use WithPagination;
@@ -39,9 +42,73 @@ final class FileManager extends Page
 
     protected static string | BackedEnum | null $navigationIcon = 'ufm-file-manager';
 
+    protected static string | Closure | null $configuredNavigationLabel = null;
+
+    protected static string | UnitEnum | Closure | null $configuredNavigationGroup = null;
+
+    protected static string | BackedEnum | Closure | null $configuredNavigationIcon = null;
+
+    protected static int | Closure | null $configuredNavigationSort = null;
+
+    protected static bool | Closure | null $configuredShouldRegisterNavigation = null;
+
+    public static function configureNavigation(
+        string | Closure | null $label = null,
+        string | UnitEnum | Closure | null $group = null,
+        string | BackedEnum | Closure | null $icon = null,
+        int | Closure | null $sort = null,
+        bool | Closure | null $shouldRegister = null,
+    ): void {
+        static::$configuredNavigationLabel = $label;
+        static::$configuredNavigationGroup = $group;
+        static::$configuredNavigationIcon = $icon;
+        static::$configuredNavigationSort = $sort;
+        static::$configuredShouldRegisterNavigation = $shouldRegister;
+    }
+
     public static function getNavigationLabel(): string
     {
+        if (static::$configuredNavigationLabel !== null) {
+            return (string) value(static::$configuredNavigationLabel);
+        }
+
         return __('filament-file-manager::file-manager.file_manager');
+    }
+
+    public static function getNavigationGroup(): string | UnitEnum | null
+    {
+        if (static::$configuredNavigationGroup !== null) {
+            return value(static::$configuredNavigationGroup);
+        }
+
+        return parent::getNavigationGroup();
+    }
+
+    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    {
+        if (static::$configuredNavigationIcon !== null) {
+            return value(static::$configuredNavigationIcon);
+        }
+
+        return parent::getNavigationIcon();
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        if (static::$configuredNavigationSort !== null) {
+            return (int) value(static::$configuredNavigationSort);
+        }
+
+        return parent::getNavigationSort();
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (static::$configuredShouldRegisterNavigation !== null) {
+            return (bool) value(static::$configuredShouldRegisterNavigation);
+        }
+
+        return parent::shouldRegisterNavigation();
     }
 
     public string $path = '';
