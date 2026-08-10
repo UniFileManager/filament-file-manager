@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\WithFileUploads;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
 use UniFileManager\Core\Services\FileManager as FileManagerService;
@@ -89,10 +90,19 @@ final class UniFilePickerUploader extends Component
 
     public function maximumUploadFiles(): int
     {
+        if (! $this->supportsMultipleTemporaryUploads()) {
+            return 1;
+        }
+
         $phpMaximum = (int) ini_get('max_file_uploads');
         $maximum = $this->multiple ? $this->maxFiles : 1;
 
         return $phpMaximum > 0 ? min($maximum, $phpMaximum) : $maximum;
+    }
+
+    public function supportsMultipleTemporaryUploads(): bool
+    {
+        return ! FileUploadConfiguration::isUsingS3();
     }
 
     public function acceptedFileTypes(): string

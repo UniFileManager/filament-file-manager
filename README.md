@@ -18,6 +18,7 @@ media.
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [Storage areas](#storage-areas)
+- [S3, R2, and MinIO](#s3-r2-and-minio)
 - [UniFilePicker](#unifilepicker)
 - [Uploads, previews, and thumbnails](#uploads-previews-and-thumbnails)
 - [Configuration](#configuration)
@@ -170,6 +171,10 @@ public disk or CDN configured deliberately:
 ],
 ```
 
+S3-compatible disks work through Laravel's filesystem configuration. See the
+[S3, R2, and MinIO guide](docs/s3-compatible-storage.md) for production
+examples.
+
 When more than one area is enabled, File Manager displays a storage-area
 switcher. The user's last selection is remembered for their current session.
 Items from different areas are never mixed in one directory listing.
@@ -186,6 +191,18 @@ or blog thumbnails.
 
 File Manager administration still requires permission in either area. A public
 asset URL, however, does not require access to the File Manager page.
+
+## S3, R2, and MinIO
+
+UniFileManager supports private and public storage areas on Laravel disks backed
+by Amazon S3, Cloudflare R2, MinIO, or another S3-compatible service. Configure
+the disk in `config/filesystems.php`, then point a storage area at that server
+defined disk and root. Do not accept disk, bucket, endpoint, or root values from
+the browser.
+
+Read the full [S3-compatible storage guide](docs/s3-compatible-storage.md) for
+environment examples, private/public area configuration, MinIO endpoint notes,
+and integration-test coverage.
 
 ## UniFilePicker
 
@@ -367,6 +384,10 @@ when opening File Manager.
 - The default area uses Laravel's private `local` disk. It refuses the standard
   `public` disk and local roots below `public/` or `storage/app/public` when an
   area is configured as private.
+- S3-compatible private areas are supported when the Laravel disk is private
+  and the storage-area root is server-defined. Public S3-compatible areas should
+  use a dedicated public bucket/prefix or CDN URL. See the
+  [S3-compatible storage guide](docs/s3-compatible-storage.md).
 - Replace the default `manageFileManager` check with application-specific core
   `FileManagerAuthorizer` and `StorageAreaResolver` classes when access depends on
   tenants or paths. Read the [multi-tenancy guide](docs/multi-tenancy.md)
@@ -454,6 +475,7 @@ Use `composer format` to apply the package's PSR-12 formatting rules.
 - [Changelog](CHANGELOG.md)
 - [Upgrade notes](docs/upgrading.md)
 - [Multi-tenancy guide](docs/multi-tenancy.md)
+- [S3-compatible storage guide](docs/s3-compatible-storage.md)
 - [Release policy](docs/releasing.md)
 - [MIT License](LICENSE)
 

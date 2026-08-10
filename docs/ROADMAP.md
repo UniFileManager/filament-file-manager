@@ -14,7 +14,7 @@
 
 - Verify the full Laravel and Filament compatibility matrix in GitHub Actions.
 - Test fresh installation and upgrade paths from the legacy single-disk configuration.
-- Add S3-compatible disk integration tests and complete an accessibility review.
+- Complete an accessibility review.
 
 ## Future work
 

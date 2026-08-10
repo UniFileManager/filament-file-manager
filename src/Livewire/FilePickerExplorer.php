@@ -15,6 +15,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
@@ -187,6 +188,10 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
     public function maximumUploadFiles(): int
     {
+        if (! $this->supportsMultipleTemporaryUploads()) {
+            return 1;
+        }
+
         $configuredMaximum = max(1, (int) config('filament-file-manager.max_upload_files'));
         $phpMaximum = (int) ini_get('max_file_uploads');
         $remainingSlots = max(1, $this->availableSelectionSlots());
@@ -194,6 +199,11 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         return $phpMaximum > 0
             ? min($configuredMaximum, $phpMaximum, $remainingSlots)
             : min($configuredMaximum, $remainingSlots);
+    }
+
+    public function supportsMultipleTemporaryUploads(): bool
+    {
+        return ! FileUploadConfiguration::isUsingS3();
     }
 
     public function availableSelectionSlots(): int
