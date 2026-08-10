@@ -4,6 +4,16 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## v0.7.7 - 2026-08-10
+
+### Added
+- Added S3, R2, MinIO, and Laravel Vapor storage guidance.
+- Added S3-compatible storage integration coverage.
+
+### Fixed
+- Fixed Laravel Vapor/S3 uploads by limiting Livewire S3 temporary uploads to one browser file per request.
+- Require `unifilemanager/core` v0.1.3 or later so Livewire S3 temporary files are streamed correctly into the configured storage area.
+
 ## v0.7.6 - 2026-07-30
 
 ### Added

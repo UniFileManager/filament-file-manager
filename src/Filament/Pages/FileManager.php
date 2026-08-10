@@ -15,6 +15,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -431,10 +432,19 @@ class FileManager extends Page
 
     public function maximumUploadFiles(): int
     {
+        if (! $this->supportsMultipleTemporaryUploads()) {
+            return 1;
+        }
+
         $configuredMaximum = max(1, (int) config('filament-file-manager.max_upload_files'));
         $phpMaximum = (int) ini_get('max_file_uploads');
 
         return $phpMaximum > 0 ? min($configuredMaximum, $phpMaximum) : $configuredMaximum;
+    }
+
+    public function supportsMultipleTemporaryUploads(): bool
+    {
+        return ! FileUploadConfiguration::isUsingS3();
     }
 
     public function rejectTooManyFiles(int $count): void
