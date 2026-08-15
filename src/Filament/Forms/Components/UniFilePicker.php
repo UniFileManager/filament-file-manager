@@ -14,10 +14,13 @@ use UniFileManager\Core\Contracts\StorageAreaResolver;
 use UniFileManager\Core\Support\DirectoryScope;
 use UniFileManager\Core\Support\MimeTypeMatcher;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\FilamentFileManager\Filament\Forms\Components\Concerns\WritesToMediaLibrary;
 use UniFileManager\FilamentFileManager\Support\PreviewUrlParameters;
 
 class UniFilePicker extends Field
 {
+    use WritesToMediaLibrary;
+
     public const DEFAULT_ALLOWED_MIME_TYPES = MimeTypeMatcher::DEFAULT_FILE_PICKER_MIME_TYPES;
 
     protected string $view = 'filament-file-manager::forms.components.uni-file-picker';
