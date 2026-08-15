@@ -117,7 +117,7 @@
                     </div>
                     <div class="ufm-picker-upload__preview-grid">
                         @foreach ($uploadedPreviewFiles as $uploadedFile)
-                            <div class="ufm-picker-upload__preview-card">
+                            <div wire:key="picker-upload-{{ $uploadedFile['path'] }}" class="ufm-picker-upload__preview-card">
                                 @if ($uploadedFile['is_image'])
                                     <img src="{{ $this->thumbnailUrl($uploadedFile['path']) }}" alt="" />
                                 @else
