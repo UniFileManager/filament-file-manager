@@ -4,6 +4,24 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## v0.8.0 - 2026-08-28
+
+### Added
+- Added `UniFilePicker::storageArea()` so picker fields can target any configured storage area.
+- Added optional Spatie Media Library collection syncing with `UniFilePicker::collection()`.
+- Added documentation and tests for storage-area picker selection and media-library integration.
+
+### Changed
+- Updated File Manager and File Picker styling to inherit Filament panel colors and modal elevation tokens.
+- Improved image preview tile styling by removing the extra tile background behind image previews.
+- Require `unifilemanager/core` v0.1.4 or later so S3-compatible and object-store listings use the optimized metadata-aware listing path.
+
+### Fixed
+- Added stable Livewire keys for File Manager grid items and File Picker cards so pagination and search update thumbnails correctly.
+- Added defensive validation around media-library syncing, including a clear error when Spatie Media Library is not installed.
+
+Thanks to @FaizAhmadSE for contributing the original picker, media-library, and theme-aware UI implementation work.
+
 ## v0.7.9 - 2026-08-10
 
 ### Added
