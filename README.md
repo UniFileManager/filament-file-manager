@@ -20,6 +20,7 @@ media.
 - [Storage areas](#storage-areas)
 - [S3, R2, and MinIO](#s3-r2-and-minio)
 - [UniFilePicker](#unifilepicker)
+- [Spatie Media Library collections](docs/spatie-media-library.md)
 - [Uploads, previews, and thumbnails](#uploads-previews-and-thumbnails)
 - [Configuration](#configuration)
 - [Translations](#translations)
@@ -55,6 +56,8 @@ this table.
   layout, and pagination for large libraries.
 - **Field-level limits** — restrict picker MIME types, target a directory, set
   file limits, and choose compact or image-card multiple-file views.
+- **Media-library collections** — optionally sync picker selections into Spatie
+  Media Library collections without deleting the underlying file-manager objects.
 - **Theme-aware UI** — controls inherit the active Filament panel primary colour
   without requiring a custom theme or Node build.
 
@@ -500,6 +503,7 @@ Use `composer format` to apply the package's PSR-12 formatting rules.
 - [Upgrade notes](docs/upgrading.md)
 - [Multi-tenancy guide](docs/multi-tenancy.md)
 - [S3-compatible storage guide](docs/s3-compatible-storage.md)
+- [Spatie Media Library guide](docs/spatie-media-library.md)
 - [Release policy](docs/releasing.md)
 - [MIT License](LICENSE)
 
