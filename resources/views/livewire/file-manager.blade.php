@@ -207,7 +207,7 @@
             <div class="ufm__folder-grid">
                 @foreach ($this->paginatedFolders->items() as $folder)
                     @if ($renamingPath === $folder['path'])
-                        <form wire:submit="saveRename" class="ufm__folder-card ufm__folder-card--renaming">
+                        <form wire:key="folder-rename-{{ $folder['path'] }}" wire:submit="saveRename" class="ufm__folder-card ufm__folder-card--renaming">
                             <span class="ufm__folder-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h4.14c.73 0 1.42.34 1.86.92l.81 1.08h5.69A2.75 2.75 0 0 1 21 8.75v8.5A2.75 2.75 0 0 1 18.25 20h-12A3.25 3.25 0 0 1 3 16.75v-10Z"/></svg></span>
                             <label class="ufm__rename-field">
                                 <span class="ufm__visually-hidden">{{ __('filament-file-manager::file-manager.folder_name') }}</span>
@@ -224,7 +224,7 @@
                             </div>
                         </form>
                     @else
-                        <article class="ufm__folder-card-wrap" @class(['ufm__folder-card-wrap--selected' => in_array($folder['path'], $selectedPaths, true)])>
+                        <article wire:key="folder-{{ $folder['path'] }}" class="ufm__folder-card-wrap" @class(['ufm__folder-card-wrap--selected' => in_array($folder['path'], $selectedPaths, true)])>
                             @if (in_array($folder['path'], $selectedPaths, true))
                                 <span class="ufm-picker-explorer__selection-check ufm__selection-check" aria-label="{{ __('filament-file-manager::file-manager.selected') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                             @endif
@@ -300,7 +300,7 @@
                 <div class="ufm__file-grid">
                     @foreach ($filePagination->items() as $file)
                         @if ($renamingPath === $file['path'])
-                            <form wire:submit="saveRename" class="ufm__file-card ufm__file-card--renaming">
+                            <form wire:key="file-rename-{{ $file['path'] }}" wire:submit="saveRename" class="ufm__file-card ufm__file-card--renaming">
                                 <div class="ufm__file-rename-content">
                                     <span class="ufm__file-preview {{ $file['type'] === 'directory' ? 'ufm__file-preview--folder' : '' }}">
                                         @if ($file['type'] === 'directory')
@@ -332,7 +332,7 @@
                                 </div>
                             </form>
                         @else
-                        <article class="ufm__file-card" x-bind:class="{ 'ufm__file-card--new': recentlyUploaded.includes({{ \Illuminate\Support\Js::from($file['path']) }}), 'ufm__file-card--selected': {{ in_array($file['path'], $selectedPaths, true) ? 'true' : 'false' }} }">
+                        <article wire:key="file-{{ $file['path'] }}" class="ufm__file-card" x-bind:class="{ 'ufm__file-card--new': recentlyUploaded.includes({{ \Illuminate\Support\Js::from($file['path']) }}), 'ufm__file-card--selected': {{ in_array($file['path'], $selectedPaths, true) ? 'true' : 'false' }} }">
                             @if (in_array($file['path'], $selectedPaths, true))
                                 <span class="ufm-picker-explorer__selection-check ufm__selection-check" aria-label="{{ __('filament-file-manager::file-manager.selected') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                             @endif
