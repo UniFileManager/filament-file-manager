@@ -58,6 +58,8 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
     private const DISPLAY_MODES = ['separate', 'all'];
 
+    private const DISPLAY_STYLES = ['grid', 'list'];
+
     private const SORT_FIELDS = ['name', 'modified_at', 'type'];
 
     public string $path = '';
@@ -65,6 +67,8 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
     public string $search = '';
 
     public string $displayMode = 'all';
+
+    public string $displayStyle = 'grid';
 
     public string $sortBy = 'name';
 
@@ -140,6 +144,17 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
         $this->displayMode = $displayMode;
         $this->resetPickerPagination();
         session()->put($this->displayPreferenceKey(), $displayMode);
+    }
+
+    public function setDisplayStyle(string $displayStyle): void
+    {
+        if (! in_array($displayStyle, self::DISPLAY_STYLES, true)) {
+            return;
+        }
+
+        $this->displayStyle = $displayStyle;
+        $this->resetPickerPagination();
+        session()->put($this->displayStylePreferenceKey(), $displayStyle);
     }
 
     public function canChooseItemLayout(): bool
@@ -628,21 +643,30 @@ final class FilePickerExplorer extends Component implements HasActions, HasSchem
 
     private function restoreDisplayPreference(): void
     {
-        if (! $this->canChooseItemLayout()) {
-            $this->displayMode = 'all';
+        if ($this->canChooseItemLayout()) {
+            $displayMode = session()->get($this->displayPreferenceKey());
 
-            return;
+            if (in_array($displayMode, self::DISPLAY_MODES, true)) {
+                $this->displayMode = $displayMode;
+            }
+        } else {
+            $this->displayMode = 'all';
         }
 
-        $displayMode = session()->get($this->displayPreferenceKey());
+        $displayStyle = session()->get($this->displayStylePreferenceKey());
 
-        if (in_array($displayMode, self::DISPLAY_MODES, true)) {
-            $this->displayMode = $displayMode;
+        if (in_array($displayStyle, self::DISPLAY_STYLES, true)) {
+            $this->displayStyle = $displayStyle;
         }
     }
 
     private function displayPreferenceKey(): string
     {
         return 'filament-file-manager.file-picker.display-mode.'.(string) (auth()->id() ?? 'guest');
+    }
+
+    private function displayStylePreferenceKey(): string
+    {
+        return 'filament-file-manager.file-picker.display-style.'.(string) (auth()->id() ?? 'guest');
     }
 }

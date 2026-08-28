@@ -18,6 +18,16 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
                 <input wire:model.live.debounce.200ms="search" type="search" placeholder="{{ __('filament-file-manager::file-manager.search_this_folder') }}" />
             </label>
+            <div class="ufm-picker-explorer__display-toggle" aria-label="{{ __('filament-file-manager::file-manager.display_style') }}">
+                <button type="button" wire:click="setDisplayStyle('grid')" aria-pressed="{{ $displayStyle === 'grid' ? 'true' : 'false' }}" class="{{ $displayStyle === 'grid' ? 'is-active' : '' }}" title="{{ __('filament-file-manager::file-manager.grid_view') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+                    <span class="ufm__visually-hidden">{{ __('filament-file-manager::file-manager.grid_view') }}</span>
+                </button>
+                <button type="button" wire:click="setDisplayStyle('list')" aria-pressed="{{ $displayStyle === 'list' ? 'true' : 'false' }}" class="{{ $displayStyle === 'list' ? 'is-active' : '' }}" title="{{ __('filament-file-manager::file-manager.list_view') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-linecap="round"/></svg>
+                    <span class="ufm__visually-hidden">{{ __('filament-file-manager::file-manager.list_view') }}</span>
+                </button>
+            </div>
             <div class="ufm-picker-explorer__options">
                 <button type="button" class="ufm-picker-explorer__icon-button" x-on:click="optionsOpen = ! optionsOpen" x-bind:aria-expanded="optionsOpen" aria-label="{{ $this->canChooseItemLayout() ? 'Item layout and sort options' : 'Sort options' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7" stroke-linecap="round"/><path d="m16 5 2 2-2 2M12 15l2 2-2 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -46,7 +56,7 @@
             <section class="ufm-picker-explorer__section">
                 <h3>{{ __('filament-file-manager::file-manager.folders') }}</h3>
                 @if ($this->paginatedFolders->total() > 0)
-                    <div class="ufm-picker-explorer__grid">
+                    <div @class(['ufm-picker-explorer__grid', 'ufm-picker-explorer__grid--list' => $displayStyle === 'list'])>
                         @foreach ($this->paginatedFolders->items() as $item)
                             @include('filament-file-manager::livewire.partials.picker-item', ['item' => $item])
                         @endforeach
@@ -60,7 +70,7 @@
             <section class="ufm-picker-explorer__section">
                 <h3>{{ __('filament-file-manager::file-manager.files') }}</h3>
                 @if ($this->paginatedFiles->total() > 0)
-                    <div class="ufm-picker-explorer__grid">
+                    <div @class(['ufm-picker-explorer__grid', 'ufm-picker-explorer__grid--list' => $displayStyle === 'list'])>
                         @foreach ($this->paginatedFiles->items() as $item)
                             @include('filament-file-manager::livewire.partials.picker-item', ['item' => $item])
                         @endforeach
@@ -73,7 +83,7 @@
         </div>
     @elseif ($this->paginatedItems->total() > 0)
         <div class="ufm-picker-explorer__content">
-            <div class="ufm-picker-explorer__grid">
+            <div @class(['ufm-picker-explorer__grid', 'ufm-picker-explorer__grid--list' => $displayStyle === 'list'])>
                 @foreach ($this->paginatedItems->items() as $item)
                     @include('filament-file-manager::livewire.partials.picker-item', ['item' => $item])
                 @endforeach

@@ -294,6 +294,58 @@
     .ufm__preview-actions { position: sticky; bottom: 0; }
 }
 
+.ufm__display-controls { display: flex; align-items: center; gap: .75rem; }
+.ufm__display-toggle,
+.ufm-picker-explorer__display-toggle { display: inline-flex; align-items: center; gap: .15rem; border: 1px solid var(--ufm-border); border-radius: .55rem; background: var(--ufm-surface); padding: .2rem; box-shadow: 0 1px 2px rgb(15 23 42 / .04); }
+.ufm__display-toggle button,
+.ufm-picker-explorer__display-toggle button { display: grid; width: 1.9rem; height: 1.9rem; place-items: center; border: 0; border-radius: .4rem; background: transparent; color: var(--ufm-muted); cursor: pointer; }
+.ufm__display-toggle button:hover,
+.ufm-picker-explorer__display-toggle button:hover { background: var(--ufm-primary-soft); color: var(--ufm-primary); }
+.ufm__display-toggle button.is-active,
+.ufm-picker-explorer__display-toggle button.is-active { background: var(--ufm-primary); color: #fff; }
+.ufm__display-toggle svg,
+.ufm-picker-explorer__display-toggle svg { width: 1rem; height: 1rem; }
+.ufm__folder-grid.ufm__folder-grid--list,
+.ufm__file-grid.ufm__file-grid--list,
+.ufm-picker-explorer__grid.ufm-picker-explorer__grid--list { grid-template-columns: 1fr; }
+.ufm__folder-grid--list .ufm__new-folder-card { min-height: 3.8rem; justify-content: flex-start; padding: .65rem .8rem; }
+.ufm__file-grid--list .ufm__file-card { min-height: 4.15rem; }
+.ufm__file-grid--list .ufm__file-select,
+.ufm__file-grid--list .ufm__file-rename-content { display: grid; min-height: 4.15rem; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .55rem .75rem; }
+.ufm__file-grid--list .ufm__file-preview { width: 3rem; height: 3rem; }
+.ufm__file-grid--list .ufm__file-preview svg { width: 1.65rem; height: 1.65rem; }
+.ufm__file-grid--list .ufm__document-icon { width: 2rem; height: 2.4rem; font-size: .45rem; }
+.ufm__file-grid--list .ufm__file-name { min-width: 0; margin: 0; }
+.ufm__file-grid--list .ufm__file-size { margin: 0; white-space: nowrap; }
+.ufm__file-grid--list .ufm__file-rename-field { margin: 0; }
+.ufm__file-grid--list .ufm__file-card--renaming .ufm__file-actions,
+.ufm__file-grid--list .ufm__file-actions { top: 50%; right: .65rem; left: auto; transform: translateY(-50%); }
+.ufm__file-grid--list .ufm__file-card:hover .ufm__file-actions,
+.ufm__file-grid--list .ufm__file-card:focus-within .ufm__file-actions,
+.ufm__file-grid--list .ufm__file-card--renaming .ufm__file-actions,
+.ufm__file-grid--list .ufm__file-card:has(.ufm__file-action:focus-visible) .ufm__file-actions { transform: translateY(-50%); }
+.ufm-picker-explorer__grid--list { gap: .45rem; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__item { display: grid; min-height: 4rem; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: .65rem; padding: .5rem .65rem; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__thumbnail { width: 3rem; height: 3rem; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__thumbnail svg { width: 1.65rem; height: 1.65rem; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__thumbnail .ufm__document-icon { width: 2rem; height: 2.4rem; font-size: .45rem; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__name,
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__meta { margin: 0; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__meta { white-space: nowrap; }
+.ufm-picker-explorer__grid--list .ufm-picker-explorer__selection-check { top: 50%; right: .65rem; transform: translateY(-50%); }
+.dark .ufm__display-toggle,
+.dark .ufm-picker-explorer__display-toggle { background: rgb(255 255 255 / .03); }
+@media (max-width: 40rem) {
+    .ufm__display-controls { width: 100%; justify-content: space-between; }
+    .ufm-picker-explorer__toolbar-actions { flex-wrap: wrap; }
+    .ufm-picker-explorer__display-toggle { margin-left: auto; }
+    .ufm__file-grid--list .ufm__file-select,
+    .ufm__file-grid--list .ufm__file-rename-content,
+    .ufm-picker-explorer__grid--list .ufm-picker-explorer__item { grid-template-columns: 2.75rem minmax(0, 1fr); }
+    .ufm__file-grid--list .ufm__file-size,
+    .ufm-picker-explorer__grid--list .ufm-picker-explorer__meta { grid-column: 2; }
+}
+
 @media (max-width: 40rem) {
     .ufm__move-footer > div:first-child { width: 100%; }
     .ufm__move-footer-actions { width: 100%; }

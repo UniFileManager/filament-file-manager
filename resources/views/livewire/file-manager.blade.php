@@ -149,7 +149,19 @@
                 <span class="ufm__search-icon">⌕</span>
                 <input wire:model.live.debounce.250ms="search" type="search" placeholder="{{ __('filament-file-manager::file-manager.search_this_folder') }}" />
             </label>
-            <p class="ufm__item-count">{{ count($this->filteredItems) .' '. (count($this->filteredItems) === 1 ? __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items')) }}</p>
+            <div class="ufm__display-controls">
+                <p class="ufm__item-count">{{ count($this->filteredItems) .' '. (count($this->filteredItems) === 1 ? __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items')) }}</p>
+                <div class="ufm__display-toggle" aria-label="{{ __('filament-file-manager::file-manager.display_style') }}">
+                    <button type="button" wire:click="setDisplayStyle('grid')" aria-pressed="{{ $displayStyle === 'grid' ? 'true' : 'false' }}" class="{{ $displayStyle === 'grid' ? 'is-active' : '' }}" title="{{ __('filament-file-manager::file-manager.grid_view') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+                        <span class="ufm__visually-hidden">{{ __('filament-file-manager::file-manager.grid_view') }}</span>
+                    </button>
+                    <button type="button" wire:click="setDisplayStyle('list')" aria-pressed="{{ $displayStyle === 'list' ? 'true' : 'false' }}" class="{{ $displayStyle === 'list' ? 'is-active' : '' }}" title="{{ __('filament-file-manager::file-manager.list_view') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-linecap="round"/></svg>
+                        <span class="ufm__visually-hidden">{{ __('filament-file-manager::file-manager.list_view') }}</span>
+                    </button>
+                </div>
+            </div>
         </section>
 
         @if (count($selectedPaths) > 0)
@@ -204,7 +216,7 @@
                 </div>
             </div>
 
-            <div class="ufm__folder-grid">
+            <div @class(['ufm__folder-grid', 'ufm__folder-grid--list' => $displayStyle === 'list'])>
                 @foreach ($this->paginatedFolders->items() as $folder)
                     @if ($renamingPath === $folder['path'])
                         <form wire:submit="saveRename" class="ufm__folder-card ufm__folder-card--renaming">
@@ -297,7 +309,7 @@
                 $filePagination = $displayMode === 'separate' ? $this->paginatedFiles : $this->paginatedItems;
             @endphp
             @if ($filePagination->total() > 0)
-                <div class="ufm__file-grid">
+                <div @class(['ufm__file-grid', 'ufm__file-grid--list' => $displayStyle === 'list'])>
                     @foreach ($filePagination->items() as $file)
                         @if ($renamingPath === $file['path'])
                             <form wire:submit="saveRename" class="ufm__file-card ufm__file-card--renaming">

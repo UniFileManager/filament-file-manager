@@ -32,3 +32,19 @@ it('keeps an existing folder when its rename is cancelled', function (): void {
 
     expect(Storage::disk('testing')->directoryExists('tenant-a/Existing folder'))->toBeTrue();
 });
+
+it('persists the selected display style', function (): void {
+    Livewire::test(FileManager::class)
+        ->assertSet('displayStyle', 'grid')
+        ->call('setDisplayStyle', 'list')
+        ->assertSet('displayStyle', 'list');
+
+    Livewire::test(FileManager::class)
+        ->assertSet('displayStyle', 'list');
+});
+
+it('ignores an invalid display style', function (): void {
+    Livewire::test(FileManager::class)
+        ->call('setDisplayStyle', 'table')
+        ->assertSet('displayStyle', 'grid');
+});

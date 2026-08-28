@@ -35,6 +35,8 @@ class FileManager extends Page
 
     private const DISPLAY_MODES = ['separate', 'all'];
 
+    private const DISPLAY_STYLES = ['grid', 'list'];
+
     private const SORT_FIELDS = ['name', 'modified_at', 'type'];
 
     protected string $view = 'filament-file-manager::livewire.file-manager';
@@ -119,6 +121,8 @@ class FileManager extends Page
     public string $search = '';
 
     public string $displayMode = 'all';
+
+    public string $displayStyle = 'grid';
 
     public string $sortBy = 'name';
 
@@ -368,6 +372,17 @@ class FileManager extends Page
             $this->resetPagination();
             $this->persistPreferences();
         }
+    }
+
+    public function setDisplayStyle(string $displayStyle): void
+    {
+        if (! in_array($displayStyle, self::DISPLAY_STYLES, true)) {
+            return;
+        }
+
+        $this->displayStyle = $displayStyle;
+        $this->resetPagination();
+        $this->persistPreferences();
     }
 
     public function canChooseItemLayout(): bool
@@ -1158,20 +1173,24 @@ class FileManager extends Page
 
     private function restorePreferences(): void
     {
-        if (! $this->canChooseItemLayout()) {
-            $this->displayMode = 'all';
-
-            return;
-        }
-
         $preferences = session()->get($this->preferencesKey());
 
         if (! is_array($preferences)) {
+            if (! $this->canChooseItemLayout()) {
+                $this->displayMode = 'all';
+            }
+
             return;
         }
 
-        if (in_array($preferences['display_mode'] ?? null, self::DISPLAY_MODES, true)) {
+        if ($this->canChooseItemLayout() && in_array($preferences['display_mode'] ?? null, self::DISPLAY_MODES, true)) {
             $this->displayMode = $preferences['display_mode'];
+        } elseif (! $this->canChooseItemLayout()) {
+            $this->displayMode = 'all';
+        }
+
+        if (in_array($preferences['display_style'] ?? null, self::DISPLAY_STYLES, true)) {
+            $this->displayStyle = $preferences['display_style'];
         }
 
         if (in_array($preferences['sort_by'] ?? null, self::SORT_FIELDS, true)) {
@@ -1187,6 +1206,7 @@ class FileManager extends Page
     {
         session()->put($this->preferencesKey(), [
             'display_mode' => $this->displayMode,
+            'display_style' => $this->displayStyle,
             'sort_by' => $this->sortBy,
             'sort_direction' => $this->sortDirection,
         ]);
