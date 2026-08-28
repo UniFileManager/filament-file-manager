@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UniFileManager Filament File Manager</title>
+    <meta name="description" content="Secure storage-area aware file manager and picker fields for Laravel Filament.">
+    <meta property="og:title" content="UniFileManager Filament File Manager">
+    <meta property="og:description" content="Secure storage-area browsing, previews, uploads, picker fields, and Spatie Media Library integration for Laravel Filament.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="./logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <!--
+      THESIS: Package documentation should feel like a working manual, not a marketing page.
+      OWN-WORLD: restrained white and blue technical surfaces with dense, readable examples.
+      STORY: install, configure, choose storage areas, then integrate picker workflows safely.
+      FIRST VIEWPORT: navigation, exact package promise, command-first action, and real UI preview.
+      FORM: dependency-free GitHub Pages documentation template for a Laravel package.
+    -->
+    <div class="site-shell">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        <a class="brand" href="#top" aria-label="UniFileManager documentation home">
+          <img src="./logo.svg" alt="">
+          <span>UniFileManager</span>
+        </a>
+
+        <nav>
+          <div class="nav-group">
+            <h2>Guide</h2>
+            <a href="#install">Install</a>
+            <a href="#compatibility">Compatibility</a>
+            <a href="#storage-areas">Storage areas</a>
+            <a href="#configuration">Configuration</a>
+            <a href="#security">Security</a>
+          </div>
+          <div class="nav-group">
+            <h2>Picker</h2>
+            <a href="#picker">UniFilePicker</a>
+            <a href="#spatie">Spatie Media Library</a>
+            <a href="#uploads">Uploads and previews</a>
+          </div>
+          <div class="nav-group">
+            <h2>Operations</h2>
+            <a href="#s3">S3, R2, and MinIO</a>
+            <a href="#tenant">Multi tenancy</a>
+            <a href="#upgrade">Upgrade</a>
+            <a href="#release">Release notes</a>
+          </div>
+        </nav>
+      </aside>
+
+      <main id="top" class="content">
+        <section class="hero">
+          <div>
+            <h1>File Manager for Laravel Filament</h1>
+            <p>Secure storage-area browsing, previews, uploads, and picker fields for private documents, public media, S3-compatible disks, and Spatie Media Library workflows.</p>
+            <div class="actions">
+              <a class="button primary" href="#install">Install package</a>
+              <a class="button" href="#picker">Use UniFilePicker</a>
+              <a class="button" href="https://github.com/UniFileManager/filament-file-manager">GitHub</a>
+            </div>
+          </div>
+          <figure class="preview">
+            <img src="https://raw.githubusercontent.com/UniFileManager/filament-file-manager/main/docs/screenshots/file-manager-overview.png" alt="UniFileManager file manager interface showing folders and files">
+          </figure>
+        </section>
+
+        <section id="install" class="section alt">
+          <h2>Install</h2>
+          <p>Install the Filament package and allow Composer to update the shared core package.</p>
+          <pre><code>composer require unifilemanager/filament-file-manager:^0.8 -W
+php artisan optimize:clear</code></pre>
+
+          <h3>Register the Filament plugin</h3>
+          <pre><code>use UniFileManager\FilamentFileManager\FilamentFileManagerPlugin;
+
+$panel
+    ->plugin(FilamentFileManagerPlugin::make());</code></pre>
+        </section>
+
+        <section id="compatibility" class="section">
+          <h2>Compatibility</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Laravel</th>
+                <th>Filament</th>
+                <th>Livewire</th>
+                <th>PHP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>11.x</td><td>4.x, 5.x</td><td>3.x, 4.x</td><td>8.2+</td></tr>
+              <tr><td>12.x</td><td>4.x, 5.x</td><td>3.x, 4.x</td><td>8.2+</td></tr>
+              <tr><td>13.x</td><td>4.x, 5.x</td><td>3.x, 4.x</td><td>8.2+</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="storage-areas" class="section alt">
+          <h2>Storage Areas</h2>
+          <p>Storage areas define trusted server-side disks, roots, and visibility. Use private areas for documents and public areas only for media that can safely expose URLs.</p>
+          <div class="grid">
+            <article class="card">
+              <h3>Private documents</h3>
+              <p>Invoices, contracts, imports, exports, and customer files.</p>
+            </article>
+            <article class="card">
+              <h3>Public media</h3>
+              <p>Website images, profile media, and other files intended for public URLs.</p>
+            </article>
+            <article class="card">
+              <h3>Custom areas</h3>
+              <p>Named areas for tenant roots, product images, avatars, or application-specific libraries.</p>
+            </article>
+          </div>
+          <pre><code>'storage_areas' => [
+    'public' => [
+        'enabled' => true,
+        'disk' => 'public',
+        'root' => 'file-manager/public',
+        'visibility' => 'public',
+    ],
+],</code></pre>
+        </section>
+
+        <section id="picker" class="section">
+          <h2>UniFilePicker</h2>
+          <p>Use `UniFilePicker` in Filament forms to select existing files, upload directly, restrict MIME types, and target a specific storage area.</p>
+          <pre><code>use UniFileManager\FilamentFileManager\Filament\Forms\Components\UniFilePicker;
+
+UniFilePicker::make('document')
+    ->privateMedia()
+    ->acceptedFileTypes(['application/pdf']);</code></pre>
+          <pre><code>UniFilePicker::make('hero_image')
+    ->storageArea('public');</code></pre>
+          <pre><code>UniFilePicker::make('attachments')
+    ->multiple()
+    ->maxFiles(10);</code></pre>
+        </section>
+
+        <section id="spatie" class="section alt">
+          <h2>Spatie Media Library</h2>
+          <p>Sync selected File Manager files into Spatie Media Library collections while keeping the original file-manager objects intact.</p>
+          <pre><code>composer require spatie/laravel-medialibrary</code></pre>
+          <pre><code>UniFilePicker::make('gallery')
+    ->multiple()
+    ->storageArea('public')
+    ->collection('gallery');</code></pre>
+          <div class="callout">
+            The model must implement Spatie's `HasMedia` contract. Removing a picker selection removes the media row from the collection, but does not delete the underlying file.
+          </div>
+          <p>When a storage area uses a root prefix, configure your Spatie path generator to honour the media row's `external_dir` custom property.</p>
+        </section>
+
+        <section id="uploads" class="section">
+          <h2>Uploads and Previews</h2>
+          <p>Uploaded files keep safe client filenames. Existing files are never overwritten; collisions become `filename (2).ext`, then `filename (3).ext`.</p>
+          <div class="grid">
+            <article class="card">
+              <h3>Previews</h3>
+              <p>Preview images, PDFs, and text files from inside the File Manager.</p>
+            </article>
+            <article class="card">
+              <h3>Thumbnails</h3>
+              <p>Supported images receive thumbnails. Other files use clear file-type tiles.</p>
+            </article>
+            <article class="card">
+              <h3>Public URLs</h3>
+              <p>Public media areas can expose copyable URLs for files intended to be public.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="s3" class="section alt">
+          <h2>S3, R2, and MinIO</h2>
+          <p>UniFileManager supports S3-compatible disks and Laravel Vapor temporary upload streams.</p>
+          <pre><code>'storage_areas' => [
+    'private' => [
+        'enabled' => true,
+        'disk' => 's3',
+        'root' => 'file-manager/private',
+        'visibility' => 'private',
+    ],
+],</code></pre>
+          <p>`unifilemanager/core` v0.1.4 optimizes object-store directory listings by using Flysystem listing metadata instead of extra metadata calls per entry.</p>
+        </section>
+
+        <section id="tenant" class="section">
+          <h2>Multi Tenancy</h2>
+          <p>Tenant-aware applications can return trusted tenant-specific disk and root configuration through a storage-area resolver.</p>
+          <pre><code>'storage_area_resolver' => App\Support\TenantStorageAreaResolver::class,</code></pre>
+          <p>Never trust browser-supplied disks or roots. Storage area definitions should come from server-side configuration or trusted tenant state.</p>
+        </section>
+
+        <section id="configuration" class="section alt">
+          <h2>Configuration</h2>
+          <p>Publish configuration when you need to customize areas, authorization, picker defaults, previews, uploads, or navigation.</p>
+          <pre><code>php artisan vendor:publish --tag=filament-file-manager-config</code></pre>
+          <pre><code>FilamentFileManagerPlugin::make()
+    ->navigationLabel('Files')
+    ->navigationIcon('heroicon-o-folder')
+    ->navigationSort(20);</code></pre>
+        </section>
+
+        <section id="security" class="section">
+          <h2>Security Model</h2>
+          <ul>
+            <li>Directory traversal is rejected.</li>
+            <li>Dot-prefixed files and directories are hidden.</li>
+            <li>The configured storage root cannot be renamed, moved, or deleted.</li>
+            <li>Picker selections are revalidated on the server before persistence.</li>
+            <li>Public URLs should be enabled only for public media areas.</li>
+          </ul>
+        </section>
+
+        <section id="upgrade" class="section alt">
+          <h2>Upgrade</h2>
+          <pre><code>composer require unifilemanager/filament-file-manager:^0.8 -W
+php artisan filament:assets
+php artisan optimize:clear</code></pre>
+          <p>If you published package views, compare them with the latest package views before upgrading.</p>
+        </section>
+
+        <section id="release" class="section">
+          <h2>Release Notes</h2>
+          <h3>v0.8.0</h3>
+          <ul>
+            <li>Added `UniFilePicker::storageArea()`.</li>
+            <li>Added optional Spatie Media Library collection syncing with `UniFilePicker::collection()`.</li>
+            <li>Updated styling to inherit Filament panel colors and modal elevation tokens.</li>
+            <li>Added stable Livewire keys for File Manager grid items and File Picker cards.</li>
+            <li>Requires `unifilemanager/core` v0.1.4 or later.</li>
+          </ul>
+          <p>Thanks to <a href="https://github.com/FaizAhmadSE">@FaizAhmadSE</a> for contributing the original picker, media-library, and theme-aware UI implementation work.</p>
+        </section>
+
+        <footer class="footer">
+          Released under the MIT License. Maintained by Sampath Arachchige.
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

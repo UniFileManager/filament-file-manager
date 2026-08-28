@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="UniFileManager">
+  <rect width="48" height="48" rx="10" fill="#0f172a"/>
+  <path d="M11 16.5C11 13.46 13.46 11 16.5 11H23l4 4h4.5c3.04 0 5.5 2.46 5.5 5.5V31c0 3.31-2.69 6-6 6H17c-3.31 0-6-2.69-6-6V16.5Z" fill="#60a5fa"/>
+  <path d="M16 23h16M16 28h10" stroke="#eff6ff" stroke-width="3" stroke-linecap="round"/>
+</svg>

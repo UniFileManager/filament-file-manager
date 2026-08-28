@@ -5,3 +5,5 @@
 /composer.lock
 /.phpunit.result.cache
 /.pest-cache/
+node_modules/
+package-lock.json
