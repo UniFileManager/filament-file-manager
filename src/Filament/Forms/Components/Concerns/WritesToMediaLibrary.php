@@ -7,6 +7,7 @@ namespace UniFileManager\FilamentFileManager\Filament\Forms\Components\Concerns;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use LogicException;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use UniFileManager\Core\Contracts\StorageAreaResolver;
@@ -45,6 +46,10 @@ trait WritesToMediaLibrary
      */
     public function collection(string|Closure|null $name): static
     {
+        if ($name !== null) {
+            $this->ensureMediaLibraryIsInstalled();
+        }
+
         $this->mediaCollection = $name;
 
         if ($name === null) {
@@ -111,6 +116,7 @@ trait WritesToMediaLibrary
         }
 
         $collection = (string) $this->getCollection();
+        $state = $this->validateSelectionState($state);
 
         /** @var array<int, string> $selected */
         $selected = array_values(array_filter(
@@ -188,6 +194,18 @@ trait WritesToMediaLibrary
     }
 
     /**
+     * Fail clearly when the optional integration package is not available.
+     */
+    protected function ensureMediaLibraryIsInstalled(): void
+    {
+        if (class_exists(HasMedia::class) && class_exists(Media::class)) {
+            return;
+        }
+
+        throw new LogicException('UniFilePicker media-library collections require spatie/laravel-medialibrary to be installed.');
+    }
+
+    /**
      * The disk behind this field's storage area.
      */
     protected function mediaLibraryDisk(): string
@@ -228,6 +246,18 @@ trait WritesToMediaLibrary
         $root = $this->mediaLibraryRoot();
         $diskKey = ltrim($diskKey, '/');
 
-        return $root === '' ? $diskKey : ltrim(substr($diskKey, strlen($root)), '/');
+        if ($root === '') {
+            return $diskKey;
+        }
+
+        if ($diskKey === $root) {
+            return '';
+        }
+
+        if (str_starts_with($diskKey, $root.'/')) {
+            return substr($diskKey, strlen($root) + 1);
+        }
+
+        return $diskKey;
     }
 }
