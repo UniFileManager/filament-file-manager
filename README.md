@@ -295,7 +295,31 @@ field with `file_picker_library` in the package configuration.
 
 If only one storage area is enabled, the picker uses it automatically. When both
 areas are enabled, configure `file_picker_default_area` or choose the intended
-area explicitly with `->privateMedia()` or `->publicMedia()`.
+area explicitly with `->privateMedia()`, `->publicMedia()`, or
+`->storageArea('area-name')` for a custom server-defined storage area.
+
+### Spatie Media Library collections
+
+`UniFilePicker` can sync selected files into a
+`spatie/laravel-medialibrary` collection instead of dehydrating a path into a
+model column:
+
+```php
+UniFilePicker::make('gallery')
+    ->multiple()
+    ->storageArea('public')
+    ->collection('gallery');
+```
+
+The model must implement Spatie's `HasMedia` contract. The field stores media
+rows that point at files already managed by UniFileManager, so removing a
+selection unlinks the media row and does not delete the underlying file.
+
+Install `spatie/laravel-medialibrary` before calling `collection()`. When your
+storage area uses a root prefix, configure your media-library path generator to
+honour the `external_dir` custom property written by this field; otherwise
+Spatie will resolve those media rows to its default id-based paths instead of
+the existing file-manager objects.
 
 ## Uploads, previews, and thumbnails
 

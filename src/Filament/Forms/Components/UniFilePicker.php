@@ -14,10 +14,13 @@ use UniFileManager\Core\Contracts\StorageAreaResolver;
 use UniFileManager\Core\Support\DirectoryScope;
 use UniFileManager\Core\Support\MimeTypeMatcher;
 use UniFileManager\Core\Exceptions\InvalidFilePath;
+use UniFileManager\FilamentFileManager\Filament\Forms\Components\Concerns\WritesToMediaLibrary;
 use UniFileManager\FilamentFileManager\Support\PreviewUrlParameters;
 
 class UniFilePicker extends Field
 {
+    use WritesToMediaLibrary;
+
     public const DEFAULT_ALLOWED_MIME_TYPES = MimeTypeMatcher::DEFAULT_FILE_PICKER_MIME_TYPES;
 
     protected string $view = 'filament-file-manager::forms.components.uni-file-picker';
@@ -137,6 +140,24 @@ class UniFilePicker extends Field
     public function directory(string|Closure|null $directory): static
     {
         $this->directory = $directory;
+
+        return $this;
+    }
+
+    /**
+     * Use a named storage area.
+     *
+     * publicMedia() and privateMedia() below name the two areas the package
+     * ships with. An application that defines its own — one area per bucket, say
+     * — has no way to point a field at them, and every field falls back to
+     * file_picker_default_area.
+     *
+     * This is still not a boundary the browser can cross: areas are declared
+     * server-side and this takes a key, never a disk, root or visibility.
+     */
+    public function storageArea(string|Closure|null $area): static
+    {
+        $this->storageArea = $area;
 
         return $this;
     }

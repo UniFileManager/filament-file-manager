@@ -23,6 +23,9 @@
     "pestphp/pest": "^3.0|^4.0",
     "pestphp/pest-plugin-laravel": "^3.0|^4.0"
   },
+  "suggest": {
+    "spatie/laravel-medialibrary": "Required when using UniFilePicker::collection() to sync selections into Spatie media-library collections."
+  },
   "autoload": {
     "psr-4": {
       "UniFileManager\\FilamentFileManager\\": "src/"
