@@ -206,6 +206,13 @@ icon-set prefix. For example, use `heroicon-o-academic-cap` rather than
 'icon' => 'heroicon-s-academic-cap', // solid Heroicon
 ```
 
+The exact name depends on the icon set installed by the application. An unknown
+icon name intentionally throws an exception in local development so invalid
+configuration is noticed immediately. Do not silently replace invalid icons
+with a default icon, because that can conceal a configuration error. In
+production, configure Laravel's normal generic error page and logging so the
+detailed exception is not shown to end users.
+
 S3-compatible disks work through Laravel's filesystem configuration. See the
 [S3, R2, and MinIO guide](docs/s3-compatible-storage.md) for production
 examples.

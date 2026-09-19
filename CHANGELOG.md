@@ -4,6 +4,16 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## v0.8.1 - 2026-09-19
+
+### Added
+- Added configurable labels and Filament/Blade icons for storage areas.
+- Added support and documentation for custom named storage areas backed by multiple disks.
+
+### Changed
+- Improved storage-area icon documentation, including the required icon-set prefix such as `heroicon-o-academic-cap`.
+- Kept invalid icon names fail-fast in development so configuration mistakes are visible immediately.
+
 ## v0.8.0 - 2026-08-28
 
 ### Added
