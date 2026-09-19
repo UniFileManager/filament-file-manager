@@ -32,3 +32,24 @@ it('keeps an existing folder when its rename is cancelled', function (): void {
 
     expect(Storage::disk('testing')->directoryExists('tenant-a/Existing folder'))->toBeTrue();
 });
+
+it('uses configured labels and icons for storage areas', function (): void {
+    config()->set('filament-file-manager.storage_areas', [
+        'private' => ['enabled' => false],
+        'documents' => [
+            'enabled' => true,
+            'label' => 'Documents',
+            'icon' => 'heroicon-o-document-text',
+            'disk' => 'testing',
+            'root' => 'tenant-a/documents',
+            'visibility' => 'private',
+        ],
+    ]);
+
+    $page = new FileManager();
+
+    expect($page->availableStorageAreas())
+        ->toBe(['documents' => 'Documents'])
+        ->and($page->storageAreaIcon('documents'))
+        ->toBe('heroicon-o-document-text');
+});

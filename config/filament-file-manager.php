@@ -23,12 +23,14 @@ return [
     'storage_areas' => [
         'private' => [
             'enabled' => true,
+            'label' => 'Private files',
             'disk' => env('FILAMENT_FILE_MANAGER_DISK', 'local'),
             'root' => env('FILAMENT_FILE_MANAGER_ROOT', 'file-manager'),
             'visibility' => 'private',
         ],
         'public' => [
             'enabled' => false,
+            'label' => 'Public media',
             'disk' => env('FILAMENT_FILE_MANAGER_PUBLIC_DISK', 'public'),
             'root' => env('FILAMENT_FILE_MANAGER_PUBLIC_ROOT', 'file-manager-public'),
             'visibility' => 'public',

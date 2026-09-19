@@ -161,17 +161,49 @@ public disk or CDN configured deliberately:
 'storage_areas' => [
     'private' => [
         'enabled' => true,
+        'label' => 'Private files',
+        'icon' => 'heroicon-o-lock-closed',
         'disk' => 'local',
         'root' => 'file-manager/private',
         'visibility' => 'private',
     ],
     'public' => [
         'enabled' => true,
+        'label' => 'Public media',
+        'icon' => 'heroicon-o-folder',
         'disk' => 'public', // Or an S3/R2 disk configured for public delivery.
         'root' => 'file-manager/public',
         'visibility' => 'public',
     ],
 ],
+```
+
+Each enabled storage area may define its own `label` and Filament `icon`, which
+is useful when exposing multiple disks:
+
+```php
+'documents' => [
+    'enabled' => true,
+    'label' => 'Documents',
+    'icon' => 'heroicon-o-document-text',
+    'disk' => 'documents',
+    'root' => 'file-manager/documents',
+    'visibility' => 'private',
+],
+```
+
+The area key is sent by the browser, while disk, root, and visibility remain
+server-side configuration.
+
+### Storage area icon names
+
+The `icon` value must be a registered Filament/Blade icon name, including its
+icon-set prefix. For example, use `heroicon-o-academic-cap` rather than
+`academic-cap`:
+
+```php
+'icon' => 'heroicon-o-academic-cap', // outline Heroicon
+'icon' => 'heroicon-s-academic-cap', // solid Heroicon
 ```
 
 S3-compatible disks work through Laravel's filesystem configuration. See the
