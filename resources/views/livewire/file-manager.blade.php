@@ -48,7 +48,9 @@
                     @if (count($this->availableStorageAreas()) > 1)
                         <div class="ufm__storage-switcher" x-on:click.outside="storageOpen = false">
                             <button type="button" class="ufm__storage-trigger" x-on:click="storageOpen = ! storageOpen" x-bind:aria-expanded="storageOpen">
-                                @if ($storageArea === 'public')
+                                @if ($icon = $this->storageAreaIcon($storageArea))
+                                    <x-filament::icon :icon="$icon" aria-hidden="true" />
+                                @elseif ($storageArea === 'public')
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16v11H4zM8 7.5V5h8v2.5M8.5 12h7M12 9.5v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 @else
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round"/></svg>
@@ -59,7 +61,9 @@
                             <div x-show="storageOpen" x-cloak class="ufm__storage-menu">
                                 @foreach ($this->availableStorageAreas() as $area => $label)
                                     <button type="button" wire:click="setStorageArea('{{ $area }}')" x-on:click="storageOpen = false" @class(['is-active' => $storageArea === $area])>
-                                        @if ($area === 'public')
+                                        @if ($icon = $this->storageAreaIcon($area))
+                                            <x-filament::icon :icon="$icon" aria-hidden="true" />
+                                        @elseif ($area === 'public')
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16v11H4zM8 7.5V5h8v2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                         @else
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round"/></svg>
@@ -72,7 +76,9 @@
                         </div>
                     @else
                         <span class="ufm__storage-indicator" title="This File Manager uses {{ $this->availableStorageAreas()[$storageArea] }}">
-                            @if ($storageArea === 'public')
+                            @if ($icon = $this->storageAreaIcon($storageArea))
+                                <x-filament::icon :icon="$icon" aria-hidden="true" />
+                            @elseif ($storageArea === 'public')
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16v11H4zM8 7.5V5h8v2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             @else
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round"/></svg>

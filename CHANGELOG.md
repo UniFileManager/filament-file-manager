@@ -4,6 +4,12 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## v0.8.1 - 2026-09-19
+
+### Added
+- Added configurable labels and Filament/Blade icons for storage areas.
+- Added support and documentation for custom named storage areas backed by multiple disks.
+
 ## v0.8.0 - 2026-08-28
 
 ### Added

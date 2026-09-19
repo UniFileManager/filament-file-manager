@@ -188,13 +188,45 @@ class FileManager extends Page
         $available = [];
         foreach (is_array($areas) ? $areas : [] as $key => $area) {
             if (is_string($key) && is_array($area) && ($area['enabled'] ?? false)) {
-                $available[$key] = $key === 'public'
-                    ? __('filament-file-manager::file-manager.public_media')
-                    : __('filament-file-manager::file-manager.private_files');
+                $available[$key] = $this->storageAreaLabel($key, $area);
             }
         }
 
         return $available === [] ? ['private' => __('filament-file-manager::file-manager.private_files')] : $available;
+    }
+
+    public function storageAreaLabel(string $area, ?array $configuration = null): string
+    {
+        $configuration ??= $this->storageAreaConfiguration($area);
+        $label = $configuration['label'] ?? null;
+
+        if (is_string($label) && trim($label) !== '') {
+            return $label;
+        }
+
+        return $area === 'public'
+            ? __('filament-file-manager::file-manager.public_media')
+            : __('filament-file-manager::file-manager.private_files');
+    }
+
+    public function storageAreaIcon(string $area, ?array $configuration = null): ?string
+    {
+        $configuration ??= $this->storageAreaConfiguration($area);
+        $icon = $configuration['icon'] ?? null;
+
+        if (is_string($icon) && trim($icon) !== '') {
+            return $icon;
+        }
+
+        return null;
+    }
+
+    /** @return array<string, mixed> */
+    private function storageAreaConfiguration(string $area): array
+    {
+        $configuration = app(StorageAreaResolver::class)->resolve($area);
+
+        return is_array($configuration) ? $configuration : [];
     }
 
     public function getMaxContentWidth(): Width
