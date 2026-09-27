@@ -781,6 +781,73 @@ class FileManager extends Page
         $this->selectedPaths[] = $path;
     }
 
+    public function selectCurrentPageFiles(): void
+    {
+        $this->reconcileSelection();
+        $filePaths = $this->currentPageFilePaths();
+
+        if ($filePaths === []) {
+            return;
+        }
+
+        $this->selectedPaths = array_values(array_unique(array_merge($this->selectedPaths, $filePaths)));
+    }
+
+    public function selectAllFiles(): void
+    {
+        $this->reconcileSelection();
+        $filePaths = $this->currentFilePaths();
+
+        if ($filePaths === []) {
+            return;
+        }
+
+        $this->selectedPaths = array_values(array_unique(array_merge($this->selectedPaths, $filePaths)));
+    }
+
+    public function selectFileRange(string $anchorPath, string $targetPath): void
+    {
+        $this->reconcileSelection();
+        $filePaths = $this->currentFilePaths();
+        $anchorIndex = array_search($anchorPath, $filePaths, true);
+        $targetIndex = array_search($targetPath, $filePaths, true);
+
+        if ($targetIndex === false) {
+            return;
+        }
+
+        if ($anchorIndex === false) {
+            $this->toggleSelection($targetPath);
+
+            return;
+        }
+
+        $start = min($anchorIndex, $targetIndex);
+        $length = abs($anchorIndex - $targetIndex) + 1;
+        $range = array_slice($filePaths, $start, $length);
+
+        $this->selectedPaths = array_values(array_unique(array_merge($this->selectedPaths, $range)));
+    }
+
+    public function selectableFileCount(): int
+    {
+        return count($this->currentFilePaths());
+    }
+
+    public function currentPageFilesSelected(): bool
+    {
+        $filePaths = $this->currentPageFilePaths();
+
+        return $filePaths !== [] && array_diff($filePaths, $this->selectedPaths) === [];
+    }
+
+    public function allFilesSelected(): bool
+    {
+        $filePaths = $this->currentFilePaths();
+
+        return $filePaths !== [] && array_diff($filePaths, $this->selectedPaths) === [];
+    }
+
     public function clearSelection(): void
     {
         $this->selectedPaths = [];
@@ -1092,6 +1159,35 @@ class FileManager extends Page
     private function refreshItems(): void
     {
         $this->items = $this->manager()->list(auth()->user(), $this->path);
+    }
+
+    /** @return list<string> */
+    private function currentFilePaths(): array
+    {
+        return array_values(array_map(
+            static fn (array $item): string => $item['path'],
+            array_filter($this->sortedItems, static fn (array $item): bool => $item['type'] === 'file'),
+        ));
+    }
+
+    /** @return list<string> */
+    private function currentPageFilePaths(): array
+    {
+        $pagination = $this->displayMode === 'separate' ? $this->paginatedFiles : $this->paginatedItems;
+
+        return array_values(array_map(
+            static fn (array $item): string => $item['path'],
+            array_filter($pagination->items(), static fn (array $item): bool => $item['type'] === 'file'),
+        ));
+    }
+
+    private function reconcileSelection(): void
+    {
+        $currentPaths = array_column($this->items, 'path');
+        $this->selectedPaths = array_values(array_unique(array_filter(
+            $this->selectedPaths,
+            static fn (mixed $path): bool => is_string($path) && in_array($path, $currentPaths, true),
+        )));
     }
 
     /** @param list<array{name: string, path: string, type: 'directory'|'file', size?: int, modified_at?: int, mime_type?: string}> $items */

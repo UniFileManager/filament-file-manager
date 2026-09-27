@@ -1,6 +1,6 @@
 <x-filament-panels::page
     class="ufm"
-    x-data="{ optionsOpen: false, storageOpen: false, filePreview: null, uploadModal: false, recentlyUploaded: [], uploadHighlightTimer: null, uploadDragging: false, uploading: false, uploadProgress: 0, maxUploadFiles: {{ $this->maximumUploadFiles() }}, copyText(value) { if (! value) return; if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(value); return; } const textarea = document.createElement('textarea'); textarea.value = value; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove(); } }"
+    x-data="{ optionsOpen: false, storageOpen: false, filePreview: null, uploadModal: false, recentlyUploaded: [], uploadHighlightTimer: null, uploadDragging: false, uploading: false, uploadProgress: 0, maxUploadFiles: {{ $this->maximumUploadFiles() }}, selectionAnchor: null, selectionContext: {{ \Illuminate\Support\Js::from($path.'|'.$search.'|'.$sortBy.'|'.$sortDirection.'|'.$displayMode) }}, selectFilesClickTimer: null, selectFiles(mode) { clearTimeout(this.selectFilesClickTimer); this.selectFilesClickTimer = setTimeout(() => mode === 'clear' ? $wire.clearSelection() : mode === 'all' ? $wire.selectAllFiles() : $wire.selectCurrentPageFiles(), 250); }, copyText(value) { if (! value) return; if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(value); return; } const textarea = document.createElement('textarea'); textarea.value = value; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove(); } }"
     x-on:unifile-manager:selected.window="localStorage.setItem('unifile-manager:selected', JSON.stringify({ path: $event.detail.path, nonce: Date.now() }))"
     x-on:file-manager:focus-rename.window="$nextTick(() => { $refs.renameItem?.focus(); $refs.renameItem?.select(); })"
     x-on:file-manager:uploaded.window="recentlyUploaded = $event.detail.paths ?? []; clearTimeout(uploadHighlightTimer); uploadHighlightTimer = setTimeout(() => recentlyUploaded = [], 4000)"
@@ -155,7 +155,20 @@
                 <span class="ufm__search-icon">⌕</span>
                 <input wire:model.live.debounce.250ms="search" type="search" placeholder="{{ __('filament-file-manager::file-manager.search_this_folder') }}" />
             </label>
-            <p class="ufm__item-count">{{ count($this->filteredItems) .' '. (count($this->filteredItems) === 1 ? __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items')) }}</p>
+            <div class="ufm__search-actions">
+                <p class="ufm__item-count">{{ count($this->filteredItems) .' '. (count($this->filteredItems) === 1 ? __('filament-file-manager::file-manager.item') : __('filament-file-manager::file-manager.items')) }}</p>
+                @if ($this->selectableFileCount() > 0)
+                    <button
+                        type="button"
+                        class="ufm__text-button"
+                        x-on:click="selectFiles({{ \Illuminate\Support\Js::from($this->allFilesSelected() ? 'clear' : ($this->currentPageFilesSelected() ? 'all' : 'page')) }})"
+                        x-on:dblclick="selectFiles({{ \Illuminate\Support\Js::from($this->allFilesSelected() ? 'clear' : 'all') }})"
+                        title="{{ __('filament-file-manager::file-manager.select_page_or_all_files') }}"
+                    >
+                        {{ $this->allFilesSelected() ? __('filament-file-manager::file-manager.clear_all_files') : ($this->currentPageFilesSelected() ? __('filament-file-manager::file-manager.select_all_pages') : __('filament-file-manager::file-manager.select_current_page')) }}
+                    </button>
+                @endif
+            </div>
         </section>
 
         @if (count($selectedPaths) > 0)
@@ -377,7 +390,7 @@
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
                                         </button>
                                     @endif
-                                    <button type="button" @class(['ufm__file-action', 'is-selected' => in_array($file['path'], $selectedPaths, true)]) wire:click="toggleSelection({{ \Illuminate\Support\Js::from($file['path']) }})" aria-pressed="{{ in_array($file['path'], $selectedPaths, true) ? 'true' : 'false' }}" aria-label="{{ in_array($file['path'], $selectedPaths, true) ? __('filament-file-manager::file-manager.deselect_file') : __('filament-file-manager::file-manager.select_file') }}" title="{{ in_array($file['path'], $selectedPaths, true) ? __('filament-file-manager::file-manager.deselect_file') : __('filament-file-manager::file-manager.select_file') }}">
+                                    <button type="button" @class(['ufm__file-action', 'is-selected' => in_array($file['path'], $selectedPaths, true)]) x-on:click.stop="const context = {{ \Illuminate\Support\Js::from($path.'|'.$search.'|'.$sortBy.'|'.$sortDirection.'|'.$displayMode) }}; const anchor = selectionContext === context ? selectionAnchor : null; if ($event.shiftKey && anchor) { $wire.selectFileRange(anchor, {{ \Illuminate\Support\Js::from($file['path']) }}); } else { $wire.toggleSelection({{ \Illuminate\Support\Js::from($file['path']) }}); } selectionAnchor = {{ \Illuminate\Support\Js::from($file['path']) }}; selectionContext = context;" aria-pressed="{{ in_array($file['path'], $selectedPaths, true) ? 'true' : 'false' }}" aria-label="{{ in_array($file['path'], $selectedPaths, true) ? __('filament-file-manager::file-manager.deselect_file') : __('filament-file-manager::file-manager.select_file') }}" title="{{ in_array($file['path'], $selectedPaths, true) ? __('filament-file-manager::file-manager.deselect_file') : __('filament-file-manager::file-manager.select_file') }}">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </button>
                                     <button type="button" class="ufm__file-action" wire:click="download({{ \Illuminate\Support\Js::from($file['path']) }})" aria-label="{{ __('filament-file-manager::file-manager.download_file') }}" title="{{ __('filament-file-manager::file-manager.download_file') }}">
