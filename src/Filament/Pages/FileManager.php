@@ -7,6 +7,7 @@ namespace UniFileManager\FilamentFileManager\Filament\Pages;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
@@ -36,6 +37,8 @@ class FileManager extends Page
     private const DISPLAY_MODES = ['separate', 'all'];
 
     private const SORT_FIELDS = ['name', 'modified_at', 'type'];
+
+    private const FOLDER_CONTENTS_CONFIRMATION = 'DELETE FOLDER CONTENTS';
 
     protected string $view = 'filament-file-manager::livewire.file-manager';
 
@@ -559,7 +562,7 @@ class FileManager extends Page
         }
     }
 
-    public function delete(string $path, FileManagerService $fileManager): void
+    public function delete(string $path, FileManagerService $fileManager, ?string $confirmation = null): void
     {
         $fileManager = $fileManager->forArea($this->storageArea);
         $type = 'item';
@@ -573,7 +576,18 @@ class FileManager extends Page
         $label = $type === 'directory' ? 'folder' : ($type === 'file' ? 'file' : 'item');
 
         try {
-            $fileManager->delete(auth()->user(), $path);
+            if ($type === 'directory') {
+                if ($this->folderRequiresTypedConfirmation($path, $fileManager)
+                    && ! $this->matchesFolderNameConfirmation($path, $confirmation)) {
+                    $this->sendInvalidFolderConfirmationNotification();
+
+                    return;
+                }
+
+                $fileManager->deleteFolder(auth()->user(), $path);
+            } else {
+                $fileManager->delete(auth()->user(), $path);
+            }
             $this->selectedPaths = array_values(array_filter(
                 $this->selectedPaths,
                 static fn (string $selectedPath): bool => $selectedPath !== $path,
@@ -601,14 +615,15 @@ class FileManager extends Page
         return Action::make('deleteItem')
             ->requiresConfirmation()
             ->modalHeading(__('filament-file-manager::file-manager.delete_item') .'?')
-            ->modalDescription(__('filament-file-manager::file-manager.delete_item_body'))
+            ->modalDescription(fn (Action $action): string => $this->deleteItemModalDescription($action->getArguments()))
+            ->schema(fn (Action $action): array => $this->deleteItemConfirmationSchema($action->getArguments()))
             ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_item'))
             ->color('danger')
-            ->action(function (array $arguments): void {
+            ->action(function (array $arguments, array $data): void {
                 $path = $arguments['path'] ?? null;
 
                 if (is_string($path)) {
-                    $this->delete($path, app(FileManagerService::class));
+                    $this->delete($path, app(FileManagerService::class), $data['confirmation'] ?? null);
                 }
             });
     }
@@ -858,15 +873,16 @@ class FileManager extends Page
         return Action::make('deleteSelectedItems')
             ->requiresConfirmation()
             ->modalHeading(__('filament-file-manager::file-manager.delete_selected_items') . '?')
-            ->modalDescription(fn (): string => sprintf(__('filament-file-manager::file-manager.delete_selected_items_body'), count($this->selectedPaths), count($this->selectedPaths) === 1 ? '' : 's'))
+            ->modalDescription(fn (): string => $this->deleteSelectedItemsModalDescription())
+            ->schema(fn (): array => $this->selectedPathsContainNonEmptyFolder() ? [$this->folderContentsConfirmationInput()] : [])
             ->modalSubmitActionLabel(__('filament-file-manager::file-manager.delete_selected_items'))
             ->color('danger')
-            ->action(function (): void {
-                $this->deleteSelectedItems(app(FileManagerService::class));
+            ->action(function (array $data): void {
+                $this->deleteSelectedItems(app(FileManagerService::class), $data['confirmation'] ?? null);
             });
     }
 
-    public function deleteSelectedItems(FileManagerService $fileManager): void
+    public function deleteSelectedItems(FileManagerService $fileManager, ?string $confirmation = null): void
     {
         $fileManager = $fileManager->forArea($this->storageArea);
         $currentPaths = array_column($this->items, 'path');
@@ -881,13 +897,28 @@ class FileManager extends Page
             return;
         }
 
+        $folderPaths = array_values(array_filter($paths, fn (string $path): bool => $this->itemType($path) === 'directory'));
+        $nonEmptyFolderPaths = array_values(array_filter(
+            $folderPaths,
+            fn (string $path): bool => $this->folderRequiresTypedConfirmation($path, $fileManager),
+        ));
+        if ($nonEmptyFolderPaths !== [] && ! hash_equals(self::FOLDER_CONTENTS_CONFIRMATION, (string) $confirmation)) {
+            $this->sendInvalidFolderConfirmationNotification();
+
+            return;
+        }
+
         $deletedPaths = [];
         $failed = 0;
         $nonEmptyFolders = 0;
 
         foreach ($paths as $path) {
             try {
-                $fileManager->delete(auth()->user(), $path);
+                if (in_array($path, $folderPaths, true)) {
+                    $fileManager->deleteFolder(auth()->user(), $path);
+                } else {
+                    $fileManager->delete(auth()->user(), $path);
+                }
                 $deletedPaths[] = $path;
             } catch (Throwable $exception) {
                 report($exception);
@@ -926,6 +957,123 @@ class FileManager extends Page
         }
 
         $notification->send();
+    }
+
+    /** @param array<string, mixed> $arguments */
+    private function deleteItemModalDescription(array $arguments): string
+    {
+        $path = $arguments['path'] ?? null;
+
+        if (is_string($path)
+            && $this->itemType($path) === 'directory'
+            && $this->folderRequiresTypedConfirmation($path)) {
+            return sprintf(
+                __('filament-file-manager::file-manager.delete_folder_confirmation_body'),
+                basename($path),
+            );
+        }
+
+        return __('filament-file-manager::file-manager.delete_item_body');
+    }
+
+    /** @param array<string, mixed> $arguments */
+    /** @return list<TextInput> */
+    private function deleteItemConfirmationSchema(array $arguments): array
+    {
+        $path = $arguments['path'] ?? null;
+
+        if (! is_string($path)
+            || $this->itemType($path) !== 'directory'
+            || ! $this->folderRequiresTypedConfirmation($path)) {
+            return [];
+        }
+
+        $folderName = basename($path);
+
+        return [$this->confirmationInput(
+            __('filament-file-manager::file-manager.confirm_folder_name'),
+            $folderName,
+            __('filament-file-manager::file-manager.confirm_folder_name_help'),
+            __('filament-file-manager::file-manager.invalid_folder_name_confirmation'),
+        )];
+    }
+
+    private function deleteSelectedItemsModalDescription(): string
+    {
+        $count = count($this->selectedPaths);
+
+        if ($this->selectedPathsContainNonEmptyFolder()) {
+            return sprintf(
+                __('filament-file-manager::file-manager.delete_selected_folders_body'),
+                $count,
+                $count === 1 ? '' : 's',
+                self::FOLDER_CONTENTS_CONFIRMATION,
+            );
+        }
+
+        return sprintf(
+            __('filament-file-manager::file-manager.delete_selected_items_body'),
+            $count,
+            $count === 1 ? '' : 's',
+        );
+    }
+
+    private function selectedPathsContainNonEmptyFolder(): bool
+    {
+        foreach ($this->selectedPaths as $path) {
+            if ($this->itemType($path) === 'directory' && $this->folderRequiresTypedConfirmation($path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function folderContentsConfirmationInput(): TextInput
+    {
+        return $this->confirmationInput(
+            __('filament-file-manager::file-manager.confirm_folder_contents'),
+            self::FOLDER_CONTENTS_CONFIRMATION,
+            __('filament-file-manager::file-manager.confirm_folder_contents_help'),
+            __('filament-file-manager::file-manager.invalid_folder_contents_confirmation'),
+        );
+    }
+
+    private function confirmationInput(string $label, string $expected, string $help, string $invalidMessage): TextInput
+    {
+        return TextInput::make('confirmation')
+            ->label($label)
+            ->helperText($help)
+            ->required()
+            ->validationMessages(['in' => $invalidMessage])
+            ->in([$expected]);
+    }
+
+    private function matchesFolderNameConfirmation(string $path, ?string $confirmation): bool
+    {
+        return is_string($confirmation) && hash_equals(basename($path), $confirmation);
+    }
+
+    private function folderRequiresTypedConfirmation(string $path, ?FileManagerService $fileManager = null): bool
+    {
+        try {
+            return ! ($fileManager ?? $this->manager())->isFolderEmpty(auth()->user(), $path);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            // If storage cannot be inspected, keep the destructive action on
+            // the safer confirmation path.
+            return true;
+        }
+    }
+
+    private function sendInvalidFolderConfirmationNotification(): void
+    {
+        Notification::make()
+            ->danger()
+            ->title(__('filament-file-manager::file-manager.delete_confirmation_failed'))
+            ->body(__('filament-file-manager::file-manager.invalid_delete_confirmation'))
+            ->send();
     }
 
     public function deleteUploadedPreview(string $path, FileManagerService $fileManager): void
