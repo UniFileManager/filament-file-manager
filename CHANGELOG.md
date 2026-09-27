@@ -4,7 +4,7 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## ## v0.8.2 - 2026-09-27
+## ## v0.8.3 - 2026-09-27
 
 ### Added
 - Added current-page and all-pages file selection with dynamic selection labels.
