@@ -6,6 +6,7 @@ use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use UniFileManager\FilamentFileManager\Filament\Pages\FileManager;
+use UniFileManager\Core\Services\FileManager as FileManagerService;
 
 beforeEach(function (): void {
     Storage::fake('testing');
@@ -140,4 +141,46 @@ it('ignores a range target that is not a current file', function (): void {
     Livewire::test(FileManager::class)
         ->call('selectFileRange', 'missing.txt', 'archive')
         ->assertSet('selectedPaths', []);
+});
+
+it('does not delete a folder without its exact name confirmation', function (): void {
+    Storage::disk('testing')->put('tenant-a/archive/document.txt', 'contents');
+
+    Livewire::test(FileManager::class)
+        ->call('delete', 'archive', app(FileManagerService::class));
+
+    expect(Storage::disk('testing')->directoryExists('tenant-a/archive'))->toBeTrue();
+});
+
+it('deletes an empty folder without typed confirmation', function (): void {
+    Storage::disk('testing')->makeDirectory('tenant-a/empty');
+
+    Livewire::test(FileManager::class)
+        ->call('delete', 'empty', app(FileManagerService::class));
+
+    expect(Storage::disk('testing')->directoryMissing('tenant-a/empty'))->toBeTrue();
+});
+
+it('recursively deletes a folder after its exact name is confirmed', function (): void {
+    Storage::disk('testing')->put('tenant-a/archive/document.txt', 'contents');
+    Storage::disk('testing')->put('tenant-a/archive/nested/child.txt', 'child');
+
+    Livewire::test(FileManager::class)
+        ->call('delete', 'archive', app(FileManagerService::class), 'archive');
+
+    expect(Storage::disk('testing')->directoryMissing('tenant-a/archive'))->toBeTrue();
+});
+
+it('requires the bulk folder confirmation phrase before deleting selected folders', function (): void {
+    Storage::disk('testing')->put('tenant-a/archive/document.txt', 'contents');
+
+    $component = Livewire::test(FileManager::class)
+        ->call('toggleSelection', 'archive')
+        ->call('deleteSelectedItems', app(FileManagerService::class));
+
+    expect(Storage::disk('testing')->directoryExists('tenant-a/archive'))->toBeTrue();
+
+    $component->call('deleteSelectedItems', app(FileManagerService::class), 'DELETE FOLDER CONTENTS');
+
+    expect(Storage::disk('testing')->directoryMissing('tenant-a/archive'))->toBeTrue();
 });

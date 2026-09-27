@@ -4,6 +4,16 @@ All notable changes to UniFileManager are documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## ## v0.8.2 - 2026-09-27
+
+### Added
+- Added current-page and all-pages file selection with dynamic selection labels.
+- Added Shift+Click range selection for files in the File Manager.
+- Added recursive folder deletion with exact-name and bulk phrase confirmations. (#28)
+
+### Changed
+- Improved bulk file selection for paginated and filtered folders. (#27)
+
 ## v0.8.1 - 2026-09-19
 
 ### Added
