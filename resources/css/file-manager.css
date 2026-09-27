@@ -37,6 +37,8 @@
 .ufm__search-icon { position: absolute; inset: 0 auto 0 1rem; display: grid; place-items: center; color: var(--gray-400); font-size: 1.35rem; }
 .ufm__search input, .ufm__folder-form input { width: 100%; border: 1px solid var(--ufm-border); border-radius: .75rem; background: var(--gray-50); color: var(--ufm-text); font: inherit; outline: none; }
 .ufm__search input { padding: .8rem 1rem .8rem 2.7rem; }
+.ufm__search-actions { display: flex; align-items: center; justify-content: flex-end; gap: .7rem; }
+.ufm__search-actions .ufm__text-button { white-space: nowrap; }
 .ufm__search input:focus, .ufm__folder-form input:focus { border-color: var(--ufm-primary); box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary-600) 15%, transparent); background: var(--ufm-surface); }
 .ufm__section { display: grid; gap: .6rem; }
 .ufm__section-heading h2 { margin: 0; font-size: 1rem; }
@@ -126,7 +128,7 @@
 @media (prefers-reduced-motion: reduce) { .ufm__file-card--new, .ufm__upload-preview-card--new { animation: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary-500) 30%, transparent); } }
 @media (max-width: 72rem) { .ufm__file-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 56rem) { .ufm__folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ufm__file-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ufm-picker-explorer__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (max-width: 40rem) { .ufm__hero-main, .ufm__search-row, .ufm__section-heading, .ufm-picker-explorer__toolbar { align-items: flex-start; flex-direction: column; } .ufm__search, .ufm-picker-explorer__search { width: 100%; } .ufm-picker-explorer__toolbar-actions { width: 100%; } .ufm-picker-explorer__search { flex: 1; } .ufm__folder-grid, .ufm__file-grid, .ufm__upload-preview-grid, .ufm-picker-explorer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ufm-picker__modal { padding: .5rem; } .ufm-picker__dialog { width: 100%; height: 92vh; } }
+@media (max-width: 40rem) { .ufm__hero-main, .ufm__search-row, .ufm__section-heading, .ufm-picker-explorer__toolbar { align-items: flex-start; flex-direction: column; } .ufm__search, .ufm-picker-explorer__search { width: 100%; } .ufm__search-actions { width: 100%; justify-content: space-between; } .ufm-picker-explorer__toolbar-actions { width: 100%; } .ufm-picker-explorer__search { flex: 1; } .ufm__folder-grid, .ufm__file-grid, .ufm__upload-preview-grid, .ufm-picker-explorer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ufm-picker__modal { padding: .5rem; } .ufm-picker__dialog { width: 100%; height: 92vh; } }
 .ufm-uni-picker__selected.is-list { grid-template-columns: 1fr; }.ufm-uni-picker__selected.is-list .ufm-uni-picker__card { display: grid; min-height: 4rem; grid-template-columns: 3.25rem minmax(0, 1fr); align-items: center; gap: .65rem; padding: .4rem; }.ufm-uni-picker__selected.is-list .ufm-uni-picker__preview { width: 3.25rem; height: 3.25rem; aspect-ratio: auto; }.ufm-uni-picker__selected.is-list .ufm-uni-picker__name { margin: 0; padding-right: 2rem; font-size: .78rem; }
 .ufm-uni-picker__helper-text { margin: -.2rem 0 0; color: var(--ufm-muted); font-family: inherit; font-size: .875rem; font-weight: 400; line-height: 1.35; }
 .ufm-picker__dialog { grid-template-rows: auto minmax(0, 1fr); }.ufm-picker__header { align-self: start; }
