@@ -54,6 +54,12 @@ this table.
   with a generic fallback when a thumbnail is unavailable.
 - **Organised browsing** — breadcrumbs, search, sorting, optional folders-first
   layout, and pagination for large libraries.
+- **Fast file selection** — select files on the current page, select all
+  filtered files across pages, clear selections, and use Shift+Click to select
+  a file range. Folder selection remains manual.
+- **Safe folder deletion** — empty folders use normal confirmation; non-empty
+  folders require typing the exact folder name, and bulk deletion containing
+  non-empty folders requires an explicit folder-contents confirmation.
 - **Field-level limits** — restrict picker MIME types, target a directory, set
   file limits, and choose compact or image-card multiple-file views.
 - **Media-library collections** — optionally sync picker selections into Spatie
@@ -67,6 +73,7 @@ this table.
 - Laravel 11, 12, or 13
 - Filament 4 or 5
 - Livewire 3 or 4
+- UniFileManager Core 0.1.5 or later
 - PHP GD is optional, but required for generated image thumbnails
 
 ## Installation
@@ -74,7 +81,7 @@ this table.
 Install the package and publish its configuration:
 
 ```bash
-composer require unifilemanager/filament-file-manager:"^0.7.2"
+composer require unifilemanager/filament-file-manager:"^0.8.3"
 php artisan vendor:publish --tag=filament-file-manager-config
 ```
 
@@ -454,7 +461,10 @@ when opening File Manager.
 - Keep the package MIME and extension lists narrow for your use case. The
   picker can apply a narrower list with `allowedMimeTypes()`.
 - The configured root cannot be renamed, moved, or deleted. A folder cannot be
-  moved into itself or one of its descendants.
+  moved into itself or one of its descendants. Empty folders use a normal
+  confirmation. Deleting a non-empty folder requires typing its exact name;
+  bulk deletion containing non-empty folders requires typing
+  `DELETE FOLDER CONTENTS`.
 - Preview and thumbnail responses require authentication, are rate-limited per
   user or guest IP address, and send private no-store and `nosniff` headers.
 - Add malware scanning in your application before making new uploads available
